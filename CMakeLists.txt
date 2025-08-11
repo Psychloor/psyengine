@@ -12,7 +12,13 @@ if (MSVC)
     endif ()
 endif ()
 
+option(PSYENGINE_EXAMPLES "Compile Examples" OFF)
+
 add_subdirectory(external)
+
+if (PSYENGINE_EXAMPLES)
+    add_subdirectory(examples)
+endif ()
 
 set(engine_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/sdl_raii.hpp

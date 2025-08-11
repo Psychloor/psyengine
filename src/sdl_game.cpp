@@ -226,6 +226,7 @@ namespace psyengine
 
     void SdlGame::render() const
     {
+        // CornFlowerBlue
         SDL_SetRenderDrawColorFloat(renderer_.get(), 0.392f, 0.584f, 0.929f, 1.0f);
         SDL_RenderClear(renderer_.get());
         SDL_SetRenderDrawColorFloat(renderer_.get(), 1.0f, 1.0f, 1.0f, 1.0f);
