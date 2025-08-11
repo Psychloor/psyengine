@@ -14,6 +14,7 @@ int main(int argc, char** argv)
 
     // Push an initial state with psyengine::StateManager::instance().pushState()
 
+    // Fixed Update Frequency, Max Fixed Updates Per Tick
     game.run(60, 10);
     return 0;
 }
