@@ -6,7 +6,7 @@
 
 namespace psyengine
 {
-    StateManager& StateManager::getInstance()
+    StateManager& StateManager::instance()
     {
         static StateManager instance;
         return instance;

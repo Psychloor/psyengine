@@ -17,7 +17,7 @@ namespace psyengine
     class StateManager
     {
     public:
-        static StateManager& getInstance();
+        static StateManager& instance();
 
         void handleEvent(SDL_Event* event) const;
         void fixedUpdate(double deltaTime) const;

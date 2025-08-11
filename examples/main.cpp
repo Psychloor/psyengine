@@ -12,6 +12,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    // Push an initial state with psyengine::StateManager::instance().pushState()
+
     game.run(60, 10);
     return 0;
 }

@@ -207,7 +207,7 @@ namespace psyengine
                 return;
 
             default:
-                StateManager::getInstance().handleEvent(&event);
+                StateManager::instance().handleEvent(&event);
                 break;
             }
         }
@@ -215,12 +215,12 @@ namespace psyengine
 
     void SdlGame::fixedUpdate(const float deltaTime)
     {
-        StateManager::getInstance().fixedUpdate(deltaTime);
+        StateManager::instance().fixedUpdate(deltaTime);
     }
 
     void SdlGame::update(const double deltaTime)
     {
-        StateManager::getInstance().update(deltaTime);
+        StateManager::instance().update(deltaTime);
     }
 
     void SdlGame::render() const
@@ -229,7 +229,7 @@ namespace psyengine
         SDL_RenderClear(renderer_.get());
         SDL_SetRenderDrawColorFloat(renderer_.get(), 1.0f, 1.0f, 1.0f, 1.0f);
 
-        StateManager::getInstance().render(renderer_.get());
+        StateManager::instance().render(renderer_.get());
 
         SDL_RenderPresent(renderer_.get());
     }
