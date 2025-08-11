@@ -4,6 +4,14 @@ project(psyengine VERSION 0.1.0 LANGUAGES CXX)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+if (MSVC)
+    cmake_policy(SET CMP0091 NEW) # MultithreadedDll and ASM things errors without
+
+    if (NOT CMAKE_GENERATOR STREQUAL "Ninja")
+        add_definitions(/MP)    # parallelize each target, unless Ninja is the generator
+    endif ()
+endif ()
+
 add_subdirectory(external)
 
 set(engine_headers

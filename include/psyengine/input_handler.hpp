@@ -28,6 +28,7 @@ namespace psyengine
         InputHandler& operator=(const InputHandler&) = delete;
         InputHandler(InputHandler&&) = delete;
         InputHandler& operator=(InputHandler&&) = delete;
+
     private:
         InputHandler();
         ~InputHandler() = default;

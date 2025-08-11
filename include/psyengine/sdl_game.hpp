@@ -38,8 +38,8 @@ namespace psyengine
         static void update(double deltaTime);
         void render() const;
 
-        bool running_;
-        bool lagging_;
+        bool running_{};
+        bool lagging_{};
 
         SdlWindowPtr window_;
         SdlRendererPtr renderer_;
