@@ -2,8 +2,8 @@
 // Created by blomq on 2025-08-11.
 //
 
-#ifndef ROGUELIKE_BASE_STATE_HPP
-#define ROGUELIKE_BASE_STATE_HPP
+#ifndef PSYENGINE_BASE_STATE_HPP
+#define PSYENGINE_BASE_STATE_HPP
 
 #include "SDL3/SDL_render.h"
 
@@ -24,4 +24,4 @@ namespace psyengine
     };
 }
 
-#endif //ROGUELIKE_BASE_STATE_HPP
+#endif //PSYENGINE_BASE_STATE_HPP

@@ -2,8 +2,8 @@
 // Created by blomq on 2025-08-11.
 //
 
-#ifndef ROGUELIKE_STATE_MANAGER_HPP
-#define ROGUELIKE_STATE_MANAGER_HPP
+#ifndef PSYENGINE_STATE_MANAGER_HPP
+#define PSYENGINE_STATE_MANAGER_HPP
 
 #include <memory>
 #include <vector>
@@ -51,4 +51,4 @@ namespace psyengine
     };
 }
 
-#endif //ROGUELIKE_STATE_MANAGER_HPP
+#endif //PSYENGINE_STATE_MANAGER_HPP

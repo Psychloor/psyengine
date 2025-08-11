@@ -2,8 +2,8 @@
 // Created by blomq on 2025-08-11.
 //
 
-#ifndef ROGUELIKE_SDL_RAII_HPP
-#define ROGUELIKE_SDL_RAII_HPP
+#ifndef PSYENGINE_SDL_RAII_HPP
+#define PSYENGINE_SDL_RAII_HPP
 
 #include <memory>
 #include <SDL3/SDL.h>
@@ -53,4 +53,4 @@ namespace psyengine
     using SdlSurfacePtr = std::unique_ptr<SDL_Surface, SdlSurfaceDestroyer>;
 }
 
-#endif //ROGUELIKE_SDL_RAII_HPP
+#endif //PSYENGINE_SDL_RAII_HPP

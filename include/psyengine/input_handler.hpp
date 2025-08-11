@@ -2,8 +2,8 @@
 // Created by blomq on 2025-08-11.
 //
 
-#ifndef ROGUELIKE_INPUT_HANDLER_HPP
-#define ROGUELIKE_INPUT_HANDLER_HPP
+#ifndef PSYENGINE_INPUT_HANDLER_HPP
+#define PSYENGINE_INPUT_HANDLER_HPP
 
 #include <array>
 
@@ -37,4 +37,4 @@ namespace psyengine
     };
 }
 
-#endif //ROGUELIKE_INPUT_HANDLER_HPP
+#endif //PSYENGINE_INPUT_HANDLER_HPP

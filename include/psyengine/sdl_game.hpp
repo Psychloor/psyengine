@@ -2,8 +2,8 @@
 // Created by blomq on 2025-08-11.
 //
 
-#ifndef ROGUELIKE_SDL_GAME_HPP
-#define ROGUELIKE_SDL_GAME_HPP
+#ifndef PSYENGINE_SDL_GAME_HPP
+#define PSYENGINE_SDL_GAME_HPP
 
 #include <string_view>
 
@@ -46,4 +46,4 @@ namespace psyengine
     };
 }
 
-#endif //ROGUELIKE_SDL_GAME_HPP
+#endif //PSYENGINE_SDL_GAME_HPP
