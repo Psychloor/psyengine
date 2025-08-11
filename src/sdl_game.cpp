@@ -6,10 +6,11 @@
 
 #include <iostream>
 
-#include "psyengine/input_handler.hpp"
-#include "psyengine/state_manager.hpp"
 #include "SDL3_mixer/SDL_mixer.h"
 #include "SDL3_ttf/SDL_ttf.h"
+
+#include "psyengine/input_handler.hpp"
+#include "psyengine/state_manager.hpp"
 
 namespace psyengine
 {
