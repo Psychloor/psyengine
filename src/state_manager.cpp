@@ -10,8 +10,8 @@ namespace psyengine
 {
     StateManager& StateManager::instance()
     {
-        static StateManager instance;
-        return instance;
+        static StateManager inst;
+        return inst;
     }
 
     void StateManager::handleEvent(SDL_Event* const event) const

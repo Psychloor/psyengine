@@ -10,8 +10,8 @@ namespace psyengine
 {
     InputHandler& InputHandler::instance()
     {
-        static InputHandler instance;
-        return instance;
+        static InputHandler inst;
+        return inst;
     }
 
     void InputHandler::updateInputState()
