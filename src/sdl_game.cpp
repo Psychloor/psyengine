@@ -4,6 +4,7 @@
 
 #include "psyengine/sdl_game.hpp"
 
+#include <cassert>
 #include <iostream>
 
 #include "SDL3_mixer/SDL_mixer.h"
@@ -17,6 +18,8 @@ namespace psyengine
 
     SdlGame::~SdlGame()
     {
+        StateManager::instance().clear();
+
         // Ensure SDL objects are destroyed before SDL_Quit
         renderer_.reset();
         window_.reset();
@@ -32,16 +35,19 @@ namespace psyengine
     {
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS))
         {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init failed: %s", SDL_GetError());
             return false;
         }
 
         if (!TTF_Init())
         {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "TTF_Init failed: %s", SDL_GetError());
             return false;
         }
 
         if (!MIX_Init())
         {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "MIX_Init failed: %s", SDL_GetError());
             return false;
         }
 
@@ -57,6 +63,7 @@ namespace psyengine
         if (!SDL_CreateWindowAndRenderer(title.data(), width, height, windowFlags, &windowTemp,
                                          &rendererTemp))
         {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindowAndRenderer failed: %s", SDL_GetError());
             return false;
         }
 
@@ -68,16 +75,8 @@ namespace psyengine
 
     void SdlGame::run(const uint16_t fixedUpdateFrequency, const size_t maxUpdatesPerTick = 10)
     {
-        if (fixedUpdateFrequency == 0)
-        {
-            std::cerr << "run() called with fixedUpdateFrequency == 0\n";
-            return;
-        }
-        if (maxUpdatesPerTick == 0)
-        {
-            std::cerr << "run() called with maxUpdatesPerTick == 0\n";
-            return;
-        }
+        assert(fixedUpdateFrequency > 0 && "Fixed update frequency must be greater than 0");
+        assert(maxUpdatesPerTick > 0 && "Max updates per tick must be greater than 0");
 
         const size_t maxUpdates = std::max<size_t>(1, maxUpdatesPerTick);
         running_ = true;
@@ -94,18 +93,15 @@ namespace psyengine
         while (running_)
         {
             const uint64_t now = SDL_GetPerformanceCounter();
-            double frameDelta = static_cast<double>(now - lastCounter) / static_cast<double>(freq);
-            lastCounter = now;
 
             // Clamp very large spikes (alt-tab, breakpoint, etc.)
-            frameDelta = std::min(frameDelta, 1.0);
-
+            const double frameDelta = std::min(static_cast<double>(now - lastCounter) / static_cast<double>(freq), 1.0);
+            lastCounter = now;
             accumulatedTime += frameDelta;
 
             // Events first, then snapshot input for this frame
             handleEvents();
             InputHandler::instance().updateInputState();
-
 
             // Fixed updates
             while (accumulatedTime >= tickPeriod && accumulatedUpdates < maxUpdates)
@@ -142,7 +138,7 @@ namespace psyengine
             update(frameDelta);
 
             // Interpolation factor for smooth rendering
-            const float alpha = static_cast<float>(accumulatedTime / tickPeriod);
+            const auto alpha = static_cast<float>(accumulatedTime / tickPeriod);
             render(alpha);
 
             // Yield a bit to reduce cpu usage
