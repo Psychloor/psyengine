@@ -142,8 +142,8 @@ namespace psyengine
             update(frameDelta);
 
             // Interpolation factor for smooth rendering
-            // const float alpha = static_cast<float>(accumulatedTime / tickPeriod);
-            render();
+            const float alpha = static_cast<float>(accumulatedTime / tickPeriod);
+            render(alpha);
 
             // Yield a bit to reduce cpu usage
             SDL_Delay(1);
@@ -224,14 +224,14 @@ namespace psyengine
         StateManager::instance().update(deltaTime);
     }
 
-    void SdlGame::render() const
+    void SdlGame::render(const float alpha) const
     {
         // CornFlowerBlue
         SDL_SetRenderDrawColorFloat(renderer_.get(), 0.392f, 0.584f, 0.929f, 1.0f);
         SDL_RenderClear(renderer_.get());
         SDL_SetRenderDrawColorFloat(renderer_.get(), 1.0f, 1.0f, 1.0f, 1.0f);
 
-        StateManager::instance().render(renderer_.get());
+        StateManager::instance().render(renderer_.get(), alpha);
 
         SDL_RenderPresent(renderer_.get());
     }

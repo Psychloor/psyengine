@@ -23,7 +23,7 @@ namespace psyengine
         void handleEvent(SDL_Event* event) const;
         void fixedUpdate(double deltaTime) const;
         void update(double deltaTime) const;
-        void render(SDL_Renderer* renderer) const;
+        void render(SDL_Renderer* renderer, float alpha) const;
 
         // Returns true if the state was pushed and onEnter() completed successfully
         bool pushState(std::unique_ptr<BaseState> state);

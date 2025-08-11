@@ -36,7 +36,7 @@ namespace psyengine
         void handleEvents();
         static void fixedUpdate(float deltaTime);
         static void update(double deltaTime);
-        void render() const;
+        void render(float alpha) const;
 
         bool running_{};
         bool lagging_{};

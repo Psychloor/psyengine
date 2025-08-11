@@ -44,14 +44,14 @@ namespace psyengine
         states_.back()->update(deltaTime);
     }
 
-    void StateManager::render(SDL_Renderer* const renderer) const
+    void StateManager::render(SDL_Renderer* const renderer, const float alpha) const
     {
         if (states_.empty())
         {
             return;
         }
 
-        states_.back()->render(renderer);
+        states_.back()->render(renderer, alpha);
     }
 
     bool StateManager::pushState(std::unique_ptr<BaseState> state)
@@ -62,17 +62,14 @@ namespace psyengine
         }
 
         states_.push_back(std::move(state));
-        try
+
+        const bool success = states_.back()->onEnter();
+        if (!success)
         {
-            return states_.back()->onEnter();
-        }
-        catch (...)
-        {
-            // Roll back to maintain stack consistency if onEnter throws
             states_.pop_back();
-            //throw; // or return false; choose based on your error-handling policy
-            return false;
         }
+
+        return success;
     }
 
     bool StateManager::popState()
