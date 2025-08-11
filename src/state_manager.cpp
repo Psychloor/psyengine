@@ -4,6 +4,8 @@
 
 #include "psyengine/state_manager.hpp"
 
+#include "psyengine/base_state.hpp"
+
 namespace psyengine
 {
     StateManager& StateManager::instance()
