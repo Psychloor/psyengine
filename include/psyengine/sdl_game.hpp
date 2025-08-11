@@ -41,8 +41,8 @@ namespace psyengine
         bool running_{};
         bool lagging_{};
 
-        SdlWindowPtr window_;
-        SdlRendererPtr renderer_;
+        raii::SdlWindowPtr window_;
+        raii::SdlRendererPtr renderer_;
     };
 }
 

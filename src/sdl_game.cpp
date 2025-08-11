@@ -67,8 +67,8 @@ namespace psyengine
             return false;
         }
 
-        window_ = SdlWindowPtr(windowTemp);
-        renderer_ = SdlRendererPtr(rendererTemp);
+        window_ = raii::SdlWindowPtr(windowTemp);
+        renderer_ = raii::SdlRendererPtr(rendererTemp);
 
         return true;
     }
