@@ -2,7 +2,7 @@
 // Created by blomq on 2025-08-11.
 //
 
-#include "psyengine/input_handler.hpp"
+#include "psyengine/input_manager.hpp"
 
 #include "SDL3/SDL_keyboard.h"
 

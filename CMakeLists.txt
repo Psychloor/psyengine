@@ -28,13 +28,14 @@ set(engine_headers
         ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/sdl_game.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/base_state.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/state_manager.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/input_handler.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/input_manager.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/time.hpp
 )
 
 set(engine_sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl_game.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/state_manager.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/input_handler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/input_manager.cpp
 )
 
 add_library(psyengine STATIC ${engine_sources} ${engine_headers})
