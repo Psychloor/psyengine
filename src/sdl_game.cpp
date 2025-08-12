@@ -5,13 +5,13 @@
 #include "psyengine/sdl_game.hpp"
 
 #include <cassert>
-#include <iostream>
 
 #include "SDL3_mixer/SDL_mixer.h"
 #include "SDL3_ttf/SDL_ttf.h"
 
-#include "psyengine/input_handler.hpp"
+#include "psyengine/input_manager.hpp"
 #include "psyengine/state_manager.hpp"
+#include "psyengine/time.hpp"
 
 namespace psyengine
 {
@@ -79,29 +79,27 @@ namespace psyengine
         assert(maxUpdatesPerTick > 0 && "Max updates per tick must be greater than 0");
 
         const size_t maxUpdates = std::max<size_t>(1, maxUpdatesPerTick);
-        running_ = true;
         const double tickPeriod = 1.0 / static_cast<double>(fixedUpdateFrequency);
 
         double accumulatedTime = 0.0;
         size_t accumulatedUpdates = 0;
 
-        const uint64_t freq = SDL_GetPerformanceFrequency();
-        uint64_t lastCounter = SDL_GetPerformanceCounter();
+        time::TimePoint lastTime = time::Now();
+        time::TimePoint lastLagWarnTime = lastTime;
 
-        uint64_t lastLagWarnCounter = 0;
-
+        running_ = true;
         while (running_)
         {
-            const uint64_t now = SDL_GetPerformanceCounter();
+            const time::TimePoint now = time::Now();
 
             // Clamp very large spikes (alt-tab, breakpoint, etc.)
-            const double frameDelta = std::min(static_cast<double>(now - lastCounter) / static_cast<double>(freq), 1.0);
-            lastCounter = now;
+            const double frameDelta = std::min(time::Elapsed(lastTime, now), 1.0);
+
+            lastTime = now;
             accumulatedTime += frameDelta;
 
             // Events first, then snapshot input for this frame
             handleEvents();
-            InputHandler::instance().updateInputState();
 
             // Fixed updates
             while (accumulatedTime >= tickPeriod && accumulatedUpdates < maxUpdates)
@@ -119,16 +117,16 @@ namespace psyengine
                 lagging_ = true;
 
                 // Throttle warning to 1/sec
-                if ((now - lastLagWarnCounter) > freq)
+                if (time::Elapsed(lastLagWarnTime, now) > 1.0)
                 {
                     SDL_Log("Warning: fixed update lagging, dropped extra steps");
-                    lastLagWarnCounter = now;
+                    lastLagWarnTime = now;
                 }
             }
             else
             {
                 // No lag
-                lastLagWarnCounter = 0;
+                lastLagWarnTime = now;
                 lagging_ = false;
             }
 
