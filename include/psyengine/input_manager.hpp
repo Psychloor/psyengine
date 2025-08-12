@@ -14,6 +14,16 @@
 
 namespace psyengine
 {
+    /**
+     * @class InputManager
+     * @brief Manages input from the keyboard, mouse, and gamepads and provides an interface for
+     *        binding actions to input events and querying their state.
+     *
+     * The InputManager class facilitates input handling by managing bindings for actions to keys,
+     * mouse buttons, and gamepad buttons. It also tracks the states of various input sources and
+     * processes SDL events to update them. This class enables querying input states such as whether
+     * a button is pressed, held, released, or clicked.
+     */
     class InputManager
     {
         using Clock = std::chrono::steady_clock;
@@ -23,6 +33,8 @@ namespace psyengine
         using GamePad = std::unordered_map<SDL_JoystickID, std::unordered_map<T, U>>;
 
     public:
+        static InputManager& instance();
+
         enum MouseButton : Uint8
         {
             Left   = SDL_BUTTON_LEFT,
@@ -82,11 +94,6 @@ namespace psyengine
             std::vector<Binding> bindings;
         };
 
-        explicit InputManager(const float holdThresholdSeconds = 0.3f) :
-            holdThreshold_(std::chrono::duration<float>(holdThresholdSeconds))
-        {
-        }
-
         // --- Action binding API ---
 
         void bindActionKey(const std::string& actionName, SDL_Keycode key);
@@ -103,9 +110,31 @@ namespace psyengine
         [[nodiscard]] bool isActionDown(const std::string& actionName) const;
         [[nodiscard]] bool isActionReleased(const std::string& actionName) const;
 
+        /**
+         * @brief Handles an SDL event and processes it to update input states accordingly.
+         *
+         * This method interprets various SDL events, such as key presses, mouse clicks, and gamepad inputs,
+         * to update the internal state of the input manager. Events related to input devices, such as
+         * keyboard, mouse, or gamepad, are used to track button presses, releases, and axis movements.
+         *
+         * @param e The SDL_Event instance representing the event to be processed.
+         */
         void handleEvent(const SDL_Event& e);
 
-        // Call this once per frame (after events, before game logic) to compute states
+        /**
+         * @brief Updates the state of input devices including keyboard, mouse, and gamepads.
+         *
+         * This method processes and updates the internal state of all input devices by determining the
+         * current state (e.g., Up, Down, or Held) of each input button based on their activity since the
+         * last update. It evaluates mouse, keyboard, and gamepad input, ensuring up-to-date information
+         * about their interaction states.
+         *
+         * The update logic accounts for transitions between states, such as a button being pressed or
+         * released, and updates the respective attributes accordingly. This maintenance allows the InputManager
+         * to provide consistent and accurate input state queries for bound actions.
+         *
+         * @note Has to be called after handling all events and before updating game logic
+         */
         void update();
 
         // -------- queries (keyboard) --------
@@ -131,7 +160,15 @@ namespace psyengine
         [[nodiscard]] float getAxisNormalized(SDL_GamepadAxis gamepadAxis,
                                               SDL_JoystickID joystickId = 0) const;
 
+        InputManager(const InputManager& other) = delete;
+        InputManager(InputManager&& other) noexcept = delete;
+        InputManager& operator=(const InputManager& other) = delete;
+        InputManager& operator=(InputManager&& other) noexcept = delete;
+
     private:
+        InputManager() : holdThreshold_(std::chrono::milliseconds(300)) {}
+        ~InputManager() = default;
+
         std::unordered_map<MouseButton, ButtonData> mouseButtons_;
         std::unordered_map<SDL_Keycode, ButtonData> keyboardButtons_;
 

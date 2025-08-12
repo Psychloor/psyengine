@@ -14,7 +14,7 @@ namespace psyengine
         return inst;
     }
 
-    void StateManager::handleEvent(SDL_Event* const event) const
+    void StateManager::handleEvent(const SDL_Event& event) const
     {
         if (states_.empty())
         {

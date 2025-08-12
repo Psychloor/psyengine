@@ -20,7 +20,7 @@ namespace psyengine
         virtual bool onEnter() { return true; };
         virtual void onExit() = 0;
 
-        virtual void handleEvent(SDL_Event* event) = 0;
+        virtual void handleEvent(const SDL_Event& event) = 0;
         virtual void fixedUpdate([[maybe_unused]] double deltaTime) = 0;
         virtual void update([[maybe_unused]] double deltaTime) = 0;
         virtual void render(SDL_Renderer* renderer, [[maybe_unused]] float alpha) = 0;

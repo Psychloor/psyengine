@@ -98,8 +98,9 @@ namespace psyengine
             lastTime = now;
             accumulatedTime += frameDelta;
 
-            // Events first, then snapshot input for this frame
+            // Events first, then update input for this frame
             handleEvents();
+            InputManager::instance().update();
 
             // Fixed updates
             while (accumulatedTime >= tickPeriod && accumulatedUpdates < maxUpdates)
@@ -201,8 +202,21 @@ namespace psyengine
                 running_ = false;
                 return;
 
+            case SDL_EVENT_KEY_DOWN:
+            case SDL_EVENT_KEY_UP:
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            case SDL_EVENT_MOUSE_BUTTON_UP:
+            case SDL_EVENT_MOUSE_MOTION:
+            case SDL_EVENT_MOUSE_WHEEL:
+            case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+            case SDL_EVENT_GAMEPAD_BUTTON_UP:
+            case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+            case SDL_EVENT_GAMEPAD_REMOVED:
+                // Fall through in case people want to use these anyway
+                InputManager::instance().handleEvent(event);
+                [[fallthrough]];
             default:
-                StateManager::instance().handleEvent(&event);
+                StateManager::instance().handleEvent(event);
                 break;
             }
         }

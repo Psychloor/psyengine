@@ -20,7 +20,7 @@ namespace psyengine
     public:
         static StateManager& instance();
 
-        void handleEvent(SDL_Event* event) const;
+        void handleEvent(const SDL_Event& event) const;
         void fixedUpdate(double deltaTime) const;
         void update(double deltaTime) const;
         void render(SDL_Renderer* renderer, float alpha) const;

@@ -7,6 +7,12 @@
 namespace psyengine
 {
 
+    InputManager& InputManager::instance()
+    {
+        static InputManager inst;
+        return inst;
+    }
+
     void InputManager::bindActionKey(const std::string& actionName, const SDL_Keycode key)
     {
         actions_[actionName].bindings.emplace_back(KeyBinding{key});
