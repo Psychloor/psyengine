@@ -160,6 +160,9 @@ namespace psyengine
         [[nodiscard]] float getAxisNormalized(SDL_GamepadAxis gamepadAxis,
                                               SDL_JoystickID joystickId = 0) const;
 
+        void setHoldThreshold(float seconds);
+        [[nodiscard]] float getHoldThreshold() const;
+
         InputManager(const InputManager& other) = delete;
         InputManager(InputManager&& other) noexcept = delete;
         InputManager& operator=(const InputManager& other) = delete;

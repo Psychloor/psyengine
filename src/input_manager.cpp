@@ -322,6 +322,16 @@ namespace psyengine
         return static_cast<float>(raw) / JOYSTICK_MAX;
     }
 
+    void InputManager::setHoldThreshold(const float seconds)
+    {
+        holdThreshold_ = std::chrono::duration<float>{seconds};
+    }
+
+    float InputManager::getHoldThreshold() const
+    {
+        return holdThreshold_.count();
+    }
+
     void InputManager::onButtonPress(const SDL_Keycode key, const TimePoint now)
     {
         auto& btn = keyboardButtons_[key];
