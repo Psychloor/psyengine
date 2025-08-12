@@ -2,8 +2,8 @@
 // Created by blomq on 2025-08-12.
 //
 
-#ifndef ROGUELIKE_TIME_HPP
-#define ROGUELIKE_TIME_HPP
+#ifndef PSYENGINE_TIME_HPP
+#define PSYENGINE_TIME_HPP
 
 #include <chrono>
 
@@ -46,4 +46,4 @@ namespace psyengine::time
     }
 }
 
-#endif //ROGUELIKE_TIME_HPP
+#endif //PSYENGINE_TIME_HPP
