@@ -14,6 +14,9 @@ namespace psyengine
     public:
         virtual ~BaseState() = default;
 
+    protected:
+        friend class StateManager;
+
         virtual bool onEnter() { return true; };
         virtual void onExit() = 0;
 
