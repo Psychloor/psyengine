@@ -8,8 +8,9 @@
 #include <memory>
 #include <vector>
 
-#include "SDL3/SDL_events.h"
-#include "SDL3/SDL_render.h"
+// ReSharper disable twice CppInconsistentNaming
+union SDL_Event;
+struct SDL_Renderer;
 
 namespace psyengine
 {

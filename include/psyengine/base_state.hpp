@@ -5,7 +5,9 @@
 #ifndef PSYENGINE_BASE_STATE_HPP
 #define PSYENGINE_BASE_STATE_HPP
 
-#include "SDL3/SDL_render.h"
+// ReSharper disable twice CppInconsistentNaming
+union SDL_Event;
+struct SDL_Renderer;
 
 namespace psyengine
 {
