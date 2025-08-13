@@ -74,7 +74,7 @@ namespace psyengine
     }
 
 
-    void SdlGame::run(const std::chrono::duration<double> fixedTimeStep, const size_t maxFixedUpdatesPerTick = 10)
+    void SdlGame::run(const std::chrono::duration<double> fixedTimeStep, const size_t maxFixedUpdatesPerTick, const std::chrono::duration<double> maxFrameTime)
     {
         assert(maxFixedUpdatesPerTick > 0 && "Max updates per tick must be greater than 0");
 
@@ -91,7 +91,7 @@ namespace psyengine
         while (running_)
         {
             const time::TimePoint now = time::Now();
-            const double frameDelta = time::Elapsed(lastTime, now);
+            const double frameDelta = std::min(time::Elapsed(lastTime, now), maxFrameTime.count());
 
             lastTime = now;
             accumulatedTime += frameDelta;
