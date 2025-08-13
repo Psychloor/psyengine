@@ -45,10 +45,38 @@ namespace psyengine::rand
         {
         };
 
+        /**
+         * @brief Determines if a given type has a `state_size` member at compile-time.
+         *
+         * This variable template evaluates to `true` if the type `T` has a `state_size` member,
+         * as determined by the `HasStateSize` trait. Otherwise, it evaluates to `false`.
+         *
+         * @tparam T The type being checked for the presence of a `state_size` member.
+         */
         template <typename T>
         inline constexpr bool HAS_STATE_SIZE_V = HasStateSize<T>::value;
 
-        // Check engine can be constructed/seeded from a SeedSequence
+        /**
+        * @brief Concept that checks whether a random engine can be seeded via std::seed_seq.
+        *
+        * A type Engine models SeedSeqConstructibleOrSeedable if it supports seeding from a seed sequence
+        * by either:
+        * - being constructible from a std::seed_seq (Engine{seq}), or
+        * - exposing a member function seed(std::seed_seq&).
+        *
+        * This concept is used to constrain helper functions that initialize RNG engines from high‑entropy
+        * seed material gathered into a std::seed_seq.
+        *
+        * @tparam Engine Candidate RNG engine type.
+        *
+        * @note Standard engines such as std::mt19937 and std::mt19937_64 satisfy this concept.
+        *
+        * @code
+        * #include <random>
+        * static_assert(SeedSeqConstructibleOrSeedable<std::mt19937>);
+        * static_assert(SeedSeqConstructibleOrSeedable<std::mt19937_64>);
+        * @endcode
+        */
         template <typename Engine>
         concept SeedSeqConstructibleOrSeedable = requires(std::seed_seq& s, Engine& e)
         {
@@ -82,7 +110,15 @@ namespace psyengine::rand
             }
         }
 
-        // Generate a seed_seq with N 32-bit words from std::random_device
+        /**
+         * @brief Creates a seed sequence for initializing random number generators.
+         *
+         * This function generates a sequence of random seed values using a random device.
+         * It ensures enough seed values, which are used to initialize more complex
+         * random number generators like Mersenne Twister.
+         *
+         * @return A seed sequence containing the generated seed values.
+         */
         template <typename Engine>
         std::seed_seq MakeSeedSeq()
         {
