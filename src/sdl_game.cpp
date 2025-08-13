@@ -74,26 +74,24 @@ namespace psyengine
     }
 
 
-    void SdlGame::run(const std::chrono::duration<double> fixedTimeStep, const size_t maxUpdatesPerTick = 10)
+    void SdlGame::run(const std::chrono::duration<double> fixedTimeStep, const size_t maxFixedUpdatesPerTick = 10)
     {
-        assert(maxUpdatesPerTick > 0 && "Max updates per tick must be greater than 0");
+        assert(maxFixedUpdatesPerTick > 0 && "Max updates per tick must be greater than 0");
 
-        const size_t maxUpdates = std::max<size_t>(1, maxUpdatesPerTick);
+        const size_t maxUpdates = std::max<size_t>(1, maxFixedUpdatesPerTick);
         const double tickPeriod = fixedTimeStep.count();
 
         double accumulatedTime = 0.0;
         size_t accumulatedUpdates = 0;
 
         time::TimePoint lastTime = time::Now();
-        time::TimePoint lastLagWarnTime = lastTime;
+        time::TimePoint lastLagWarnTime = time::TimePoint::min();
 
         running_ = true;
         while (running_)
         {
             const time::TimePoint now = time::Now();
-
-            // Clamp very large spikes (alt-tab, breakpoint, etc.)
-            const double frameDelta = std::min(time::Elapsed(lastTime, now), 1.0);
+            const double frameDelta = time::Elapsed(lastTime, now);
 
             lastTime = now;
             accumulatedTime += frameDelta;
@@ -110,6 +108,7 @@ namespace psyengine
                 fixedUpdate(tickPeriod);
             }
 
+            // Check for lag
             if (accumulatedTime >= tickPeriod)
             {
                 // We’re still behind; drop extra lag but keep phase remainder

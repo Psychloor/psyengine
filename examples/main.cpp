@@ -1,4 +1,6 @@
-﻿#include <SDL3/SDL_main.h>
+﻿#include <chrono>
+
+#include <SDL3/SDL_main.h>
 #include "SDL3/SDL.h"
 
 #include "psyengine/sdl_game.hpp"
@@ -14,7 +16,11 @@ int main(int argc, char** argv)
 
     // Push an initial state with psyengine::StateManager::instance().pushState()
 
-    // Fixed Update Frequency, Max Fixed Updates Per Tick
-    game.run(60, 10);
+
+    constexpr int fixedUpdateFrequency = 60;
+    constexpr int maxFixedUpdatesPerTick = 10;
+    constexpr auto fixedTimeStep = std::chrono::duration<double>(1.0 / static_cast<double>(fixedUpdateFrequency));
+
+    game.run(fixedTimeStep, maxFixedUpdatesPerTick);
     return 0;
 }

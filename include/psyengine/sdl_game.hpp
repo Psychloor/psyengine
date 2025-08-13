@@ -18,7 +18,7 @@ namespace psyengine
         ~SdlGame();
 
         bool init(const std::string& title, int width, int height, bool resizeableWindow = false);
-        void run(std::chrono::duration<double> fixedTimeStep, size_t maxUpdatesPerTick);
+        void run(std::chrono::duration<double> fixedTimeStep, size_t maxFixedUpdatesPerTick);
 
         bool setWindowTitle(const std::string& title) const;
         bool setWindowSize(int width, int height) const;
