@@ -8,8 +8,6 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 if (MSVC)
-    cmake_policy(SET CMP0091 NEW) # MultithreadedDll and ASM things errors without
-
     if (NOT CMAKE_GENERATOR STREQUAL "Ninja")
         add_definitions(/MP)    # parallelize each target, unless Ninja is the generator
     endif ()
@@ -17,51 +15,46 @@ endif ()
 
 option(PSYENGINE_EXAMPLES "Compile Examples" OFF)
 
+file(
+        GLOB_RECURSE PSY_ENGINE_SOURCE_FILES
+        CONFIGURE_DEPENDS  # Automatically reconfigure if source files are added/removed.
+        ${PROJECT_SOURCE_DIR}/src/*.cpp
+        ${PROJECT_SOURCE_DIR}/include/psyengine/*.hpp
+        ${PROJECT_SOURCE_DIR}/include/psyengine/*.tpp
+)
+
 add_subdirectory(external)
 
 if (PSYENGINE_EXAMPLES)
     add_subdirectory(examples)
 endif ()
 
-set(engine_headers
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/sdl_raii.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/sdl_game.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/base_state.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/state_manager.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/input_manager.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/psyengine/time.hpp
-)
+add_library(${PROJECT_NAME} STATIC ${PSY_ENGINE_SOURCE_FILES})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-set(engine_sources
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl_game.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/state_manager.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/input_manager.cpp
-)
-
-add_library(psyengine STATIC ${engine_sources} ${engine_headers})
-add_library(psyengine::psyengine ALIAS psyengine)
-
-target_compile_features(psyengine PUBLIC cxx_std_23)
-set_target_properties(psyengine PROPERTIES
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
+set_target_properties(${PROJECT_NAME} PROPERTIES
         CXX_STANDARD 23
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF
 )
 
 if(MSVC)
-    target_compile_options(psyengine PRIVATE /W4 /WX)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
+    # Enforce UTF-8 encoding on MSVC.
+    target_compile_options(${PROJECT_NAME} PRIVATE /utf-8)
 else()
-    target_compile_options(psyengine PRIVATE -Wall -Wextra -Wpedantic -Werror)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
 # Public includes for consumers; build interface points to your include/ folder
-target_include_directories(psyengine
+target_include_directories(${PROJECT_NAME}
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_link_libraries(psyengine
+target_link_libraries(${PROJECT_NAME}
         PUBLIC
         SDL3_ttf::SDL3_ttf
         SDL3_mixer::SDL3_mixer

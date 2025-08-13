@@ -1,0 +1,89 @@
+﻿# Generated from CLion Inspection settings
+---
+Checks: '-*,
+concurrency-*,
+mpi-*,
+performance-*,
+bugprone-*,
+-bugprone-casting-through-void,
+-bugprone-bitwise-pointer-cast,
+-bugprone-assignment-in-if-condition,
+-bugprone-capturing-this-in-member-variable,
+cert-err52-cpp,
+cert-err60-cpp,
+cert-err34-c,
+cert-str34-c,
+cert-msc50-cpp,
+cert-msc51-cpp,
+cert-dcl58-cpp,
+cert-flp30-c,
+cppcoreguidelines-avoid-non-const-global-variables,
+cppcoreguidelines-pro-type-member-init,
+cppcoreguidelines-noexcept-swap,
+cppcoreguidelines-avoid-reference-coroutine-parameters,
+cppcoreguidelines-slicing,
+cppcoreguidelines-pro-type-cstyle-cast,
+cppcoreguidelines-interfaces-global-init,
+cppcoreguidelines-pro-type-static-cast-downcast,
+cppcoreguidelines-narrowing-conversions,
+cppcoreguidelines-noexcept-destructor,
+cppcoreguidelines-c-copy-assignment-signature,
+cppcoreguidelines-noexcept-move-operations,
+google-default-arguments,
+google-build-explicit-make-pair,
+google-runtime-operator,
+google-explicit-constructor,
+hicpp-multiway-paths-covered,
+hicpp-avoid-goto,
+hicpp-exception-baseclass,
+misc-unconventional-assign-operator,
+misc-misplaced-const,
+misc-new-delete-overloads,
+misc-non-copyable-objects,
+misc-throw-by-value-catch-by-reference,
+misc-uniqueptr-reset-release,
+modernize-*,
+-modernize-use-trailing-return-type,
+-modernize-use-std-print,
+-modernize-use-default-member-init,
+openmp-use-default-none,
+portability-*,
+-portability-avoid-pragma-once,
+-portability-restrict-system-includes,
+readability-*,
+-readability-named-parameter,
+-readability-function-size,
+-readability-identifier-length,
+-readability-magic-numbers,
+-readability-redundant-member-init,
+-readability-suspicious-call-argument,
+-readability-uppercase-literal-suffix,
+-readability-math-missing-parentheses,
+-readability-operators-representation,
+-readability-avoid-nested-conditional-operator,
+-readability-redundant-casting,
+-readability-qualified-auto,
+-readability-isolate-declaration,
+-readability-redundant-access-specifiers,
+-readability-function-cognitive-complexity,
+-readability-identifier-naming,
+-readability-reference-to-constructed-temporary'
+
+CheckOptions:
+  # Scopes
+  - { key: readability-identifier-naming.NamespaceCase,        value: lower_case }
+  - { key: readability-identifier-naming.ClassCase,            value: CamelCase }
+  - { key: readability-identifier-naming.StructCase,           value: CamelCase }
+  - { key: readability-identifier-naming.EnumCase,             value: CamelCase }
+  - { key: readability-identifier-naming.EnumConstantCase,     value: UPPER_CASE }
+  - { key: readability-identifier-naming.FunctionCase,         value: camelBack }
+  - { key: readability-identifier-naming.VariableCase,         value: camelBack }
+  - { key: readability-identifier-naming.GlobalVariableCase,   value: camelBack }
+  - { key: readability-identifier-naming.PrivateMemberCase,    value: camelBack }
+  - { key: readability-identifier-naming.PrivateMemberSuffix,  value: _ }
+  - { key: readability-identifier-naming.MacroDefinitionCase,  value: UPPER_CASE }
+  - { key: readability-identifier-naming.ConstantCase,         value: UPPER_CASE }
+
+  # Let third‑party or generated names pass (adjust as needed)
+  - { key: readability-identifier-naming.IgnoreMainLikeFunctions, value: 1 }
+  - { key: readability-identifier-naming.AllowedIdentifiers, value: SDL_.*, ImGui_.* }

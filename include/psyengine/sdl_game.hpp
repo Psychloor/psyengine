@@ -5,7 +5,7 @@
 #ifndef PSYENGINE_SDL_GAME_HPP
 #define PSYENGINE_SDL_GAME_HPP
 
-#include <string_view>
+#include <chrono>
 
 #include "psyengine/sdl_raii.hpp"
 
@@ -17,10 +17,10 @@ namespace psyengine
         SdlGame() = default;
         ~SdlGame();
 
-        bool init(std::string_view title, int width, int height, bool resizeableWindow = false);
-        void run(uint16_t fixedUpdateFrequency, size_t maxUpdatesPerTick);
+        bool init(const std::string& title, int width, int height, bool resizeableWindow = false);
+        void run(std::chrono::duration<double> fixedTimeStep, size_t maxUpdatesPerTick);
 
-        bool setWindowTitle(std::string_view title) const;
+        bool setWindowTitle(const std::string& title) const;
         bool setWindowSize(int width, int height) const;
         bool setWindowFullscreen(bool fullscreen) const;
         bool setWindowVsync(bool vsync) const;

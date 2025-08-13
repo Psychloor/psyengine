@@ -1,5 +1,5 @@
 ﻿//
-// Created by blomq on 2025-08-11.
+// Created by psychloor on 2025-08-11.
 //
 
 #include "psyengine/input_manager.hpp"
@@ -26,7 +26,7 @@ namespace psyengine
     void InputManager::bindActionGamepadButton(const std::string& actionName, const SDL_GamepadButton button,
                                                const SDL_JoystickID joystickId)
     {
-        actions_[actionName].bindings.emplace_back(GamepadBinding{button, joystickId});
+        actions_[actionName].bindings.emplace_back(GamepadBinding{.button = button, .joystickId = joystickId});
     }
 
     bool InputManager::isActionClicked(const std::string& actionName) const
@@ -37,13 +37,21 @@ namespace psyengine
             {
                 using T = std::decay_t<TBinding>;
                 if constexpr (std::is_same_v<T, KeyBinding>)
+                {
                     return mgr.isClicked(bind.key);
+                }
                 else if constexpr (std::is_same_v<T, MouseBinding>)
+                {
                     return mgr.isClicked(bind.button);
+                }
                 else if constexpr (std::is_same_v<T, GamepadBinding>)
+                {
                     return mgr.isClicked(bind.button, bind.joystickId);
+                }
                 else
+                {
                     return false;
+                }
             }, b);
         });
     }
@@ -56,13 +64,21 @@ namespace psyengine
             {
                 using T = std::decay_t<TBinding>;
                 if constexpr (std::is_same_v<T, KeyBinding>)
+                {
                     return mgr.isHeld(bind.key);
+                }
                 else if constexpr (std::is_same_v<T, MouseBinding>)
+                {
                     return mgr.isHeld(bind.button);
+                }
                 else if constexpr (std::is_same_v<T, GamepadBinding>)
+                {
                     return mgr.isHeld(bind.button, bind.joystickId);
+                }
                 else
+                {
                     return false;
+                }
             }, b);
         });
     }
@@ -75,13 +91,21 @@ namespace psyengine
             {
                 using T = std::decay_t<TBinding>;
                 if constexpr (std::is_same_v<T, KeyBinding>)
+                {
                     return mgr.isDown(bind.key);
+                }
                 else if constexpr (std::is_same_v<T, MouseBinding>)
+                {
                     return mgr.isDown(bind.button);
+                }
                 else if constexpr (std::is_same_v<T, GamepadBinding>)
+                {
                     return mgr.isDown(bind.button, bind.joystickId);
+                }
                 else
+                {
                     return false;
+                }
             }, b);
         });
     }
@@ -94,13 +118,21 @@ namespace psyengine
             {
                 using T = std::decay_t<TBinding>;
                 if constexpr (std::is_same_v<T, KeyBinding>)
+                {
                     return mgr.isReleased(bind.key);
+                }
                 else if constexpr (std::is_same_v<T, MouseBinding>)
+                {
                     return mgr.isReleased(bind.button);
+                }
                 else if constexpr (std::is_same_v<T, GamepadBinding>)
+                {
                     return mgr.isReleased(bind.button, bind.joystickId);
+                }
                 else
+                {
                     return false;
+                }
             }, b);
         });
     }
@@ -111,7 +143,9 @@ namespace psyengine
         {
         case SDL_EVENT_KEY_DOWN:
             if (!e.key.repeat)
+            {
                 onButtonPress(e.key.key, Clock::now());
+            }
             break;
         case SDL_EVENT_KEY_UP:
             onButtonRelease(e.key.key);
@@ -165,18 +199,26 @@ namespace psyengine
             if (mouseButton.isDown)
             {
                 if (auto heldTime = now - mouseButton.pressTime; heldTime >= holdThreshold_)
+                {
                     mouseButton.state = ButtonState::Held;
+                }
                 else
+                {
                     mouseButton.state = ButtonState::Down;
+                }
             }
             else
             {
                 if (mouseButton.wasDown)
                 {
                     if (auto heldTime = now - mouseButton.pressTime; heldTime < holdThreshold_)
+                    {
                         mouseButton.state = ButtonState::Clicked;
+                    }
                     else
+                    {
                         mouseButton.state = ButtonState::Released;
+                    }
                 }
             }
             mouseButton.wasDown = mouseButton.isDown;
@@ -191,18 +233,26 @@ namespace psyengine
             if (keyboardButton.isDown)
             {
                 if (auto heldTime = now - keyboardButton.pressTime; heldTime >= holdThreshold_)
+                {
                     keyboardButton.state = ButtonState::Held;
+                }
                 else
+                {
                     keyboardButton.state = ButtonState::Down;
+                }
             }
             else
             {
                 if (keyboardButton.wasDown)
                 {
                     if (auto heldTime = now - keyboardButton.pressTime; heldTime < holdThreshold_)
+                    {
                         keyboardButton.state = ButtonState::Clicked;
+                    }
                     else
+                    {
                         keyboardButton.state = ButtonState::Released;
+                    }
                 }
             }
             keyboardButton.wasDown = keyboardButton.isDown;
@@ -220,18 +270,26 @@ namespace psyengine
                 if (gamepadButton.isDown)
                 {
                     if (auto heldTime = now - gamepadButton.pressTime; heldTime >= holdThreshold_)
+                    {
                         gamepadButton.state = ButtonState::Held;
+                    }
                     else
+                    {
                         gamepadButton.state = ButtonState::Down;
+                    }
                 }
                 else
                 {
                     if (gamepadButton.wasDown)
                     {
                         if (auto heldTime = now - gamepadButton.pressTime; heldTime < holdThreshold_)
+                        {
                             gamepadButton.state = ButtonState::Clicked;
+                        }
                         else
+                        {
                             gamepadButton.state = ButtonState::Released;
+                        }
                     }
                 }
                 gamepadButton.wasDown = gamepadButton.isDown;
@@ -307,7 +365,9 @@ namespace psyengine
         if (const auto it = axes_.find(joystickId); it != axes_.end())
         {
             if (const auto axesIt = it->second.find(gamepadAxis); axesIt != it->second.end())
+            {
                 return axesIt->second.value;
+            }
         }
         return 0;
     }
@@ -316,9 +376,12 @@ namespace psyengine
     {
         // use positive max for division to keep -1..1 roughly symmetric
         static constexpr auto JOYSTICK_MAX = static_cast<float>(SDL_JOYSTICK_AXIS_MAX); // 32767
+
         const auto raw = getAxisRaw(gamepadAxis, joystickId);
         if (raw == 0)
+        {
             return 0.0f;
+        }
         return static_cast<float>(raw) / JOYSTICK_MAX;
     }
 
@@ -379,7 +442,9 @@ namespace psyengine
         if (const auto it = gamepadButtons_.find(joystickId); it != gamepadButtons_.end())
         {
             if (const auto buttonIt = it->second.find(button); buttonIt != it->second.end())
+            {
                 return buttonIt->second.state;
+            }
         }
         return ButtonState::Up;
     }
@@ -387,14 +452,18 @@ namespace psyengine
     InputManager::ButtonState InputManager::getButtonState(const SDL_Keycode key) const
     {
         if (const auto it = keyboardButtons_.find(key); it != keyboardButtons_.end())
+        {
             return it->second.state;
+        }
         return ButtonState::Up;
     }
 
     InputManager::ButtonState InputManager::getButtonState(const MouseButton mouseButton) const
     {
         if (const auto it = mouseButtons_.find(mouseButton); it != mouseButtons_.end())
+        {
             return it->second.state;
+        }
         return ButtonState::Up;
     }
 

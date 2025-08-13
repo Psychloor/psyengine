@@ -44,7 +44,7 @@ namespace psyengine
             X2     = SDL_BUTTON_X2,
         };
 
-        enum class ButtonState
+        enum class ButtonState : Uint8
         {
             Up,
             Down,

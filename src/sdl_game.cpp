@@ -31,7 +31,7 @@ namespace psyengine
         SDL_Quit();
     }
 
-    bool SdlGame::init(const std::string_view title, const int width, const int height, const bool resizeableWindow)
+    bool SdlGame::init(const std::string& title, const int width, const int height, const bool resizeableWindow)
     {
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD))
         {
@@ -60,7 +60,7 @@ namespace psyengine
 
         SDL_Window* windowTemp;
         SDL_Renderer* rendererTemp;
-        if (!SDL_CreateWindowAndRenderer(title.data(), width, height, windowFlags, &windowTemp,
+        if (!SDL_CreateWindowAndRenderer(title.c_str(), width, height, windowFlags, &windowTemp,
                                          &rendererTemp))
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindowAndRenderer failed: %s", SDL_GetError());
@@ -73,13 +73,13 @@ namespace psyengine
         return true;
     }
 
-    void SdlGame::run(const uint16_t fixedUpdateFrequency, const size_t maxUpdatesPerTick = 10)
+
+    void SdlGame::run(const std::chrono::duration<double> fixedTimeStep, const size_t maxUpdatesPerTick = 10)
     {
-        assert(fixedUpdateFrequency > 0 && "Fixed update frequency must be greater than 0");
         assert(maxUpdatesPerTick > 0 && "Max updates per tick must be greater than 0");
 
         const size_t maxUpdates = std::max<size_t>(1, maxUpdatesPerTick);
-        const double tickPeriod = 1.0 / static_cast<double>(fixedUpdateFrequency);
+        const double tickPeriod = fixedTimeStep.count();
 
         double accumulatedTime = 0.0;
         size_t accumulatedUpdates = 0;
@@ -145,9 +145,9 @@ namespace psyengine
         }
     }
 
-    bool SdlGame::setWindowTitle(const std::string_view title) const
+    bool SdlGame::setWindowTitle(const std::string& title) const
     {
-        return SDL_SetWindowTitle(window_.get(), title.data());
+        return SDL_SetWindowTitle(window_.get(), title.c_str());
     }
 
     bool SdlGame::setWindowSize(const int width, const int height) const
@@ -162,7 +162,7 @@ namespace psyengine
 
     bool SdlGame::setWindowVsync(const bool vsync) const
     {
-        return SDL_SetWindowSurfaceVSync(window_.get(), vsync);
+        return SDL_SetWindowSurfaceVSync(window_.get(), vsync ? 1 : SDL_WINDOW_SURFACE_VSYNC_DISABLED);
     }
 
     void SdlGame::quit()
