@@ -107,7 +107,7 @@ namespace psyengine
             {
                 accumulatedTime -= tickPeriod;
                 ++accumulatedUpdates;
-                fixedUpdate(static_cast<float>(tickPeriod));
+                fixedUpdate(tickPeriod);
             }
 
             if (accumulatedTime >= tickPeriod)
@@ -222,7 +222,7 @@ namespace psyengine
         }
     }
 
-    void SdlGame::fixedUpdate(const float deltaTime)
+    void SdlGame::fixedUpdate(const double deltaTime)
     {
         StateManager::instance().fixedUpdate(deltaTime);
     }

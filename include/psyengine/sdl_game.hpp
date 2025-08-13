@@ -34,7 +34,7 @@ namespace psyengine
 
     private:
         void handleEvents();
-        static void fixedUpdate(float deltaTime);
+        static void fixedUpdate(double deltaTime);
         static void update(double deltaTime);
         void render(float alpha) const;
 
