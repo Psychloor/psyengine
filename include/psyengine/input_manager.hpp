@@ -12,6 +12,8 @@
 
 #include <SDL3/SDL.h>
 
+#include "time.hpp"
+
 namespace psyengine
 {
     /**
@@ -476,6 +478,10 @@ namespace psyengine
         static std::string getKeyName(SDL_Keycode key);
         static std::string getGamepadButtonName(SDL_GamepadButton button);
         static std::string getGamepadAxisName(SDL_GamepadAxis axis);
+
+        void updateGamepads(const time::TimePoint& now);
+        void updateMouseButtons(const time::TimePoint& now);
+        void updateKeyboardButtons(const time::TimePoint& now);
     };
 
 #include "input_manager.tpp"

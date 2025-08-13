@@ -65,7 +65,6 @@ readability-*,
 -readability-qualified-auto,
 -readability-isolate-declaration,
 -readability-redundant-access-specifiers,
--readability-function-cognitive-complexity,
 -readability-identifier-naming,
 -readability-reference-to-constructed-temporary'
 

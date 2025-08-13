@@ -190,111 +190,9 @@ namespace psyengine
     {
         const auto now = Clock::now();
 
-        // mouse
-        // ReSharper disable once CppUseElementsView
-        for (auto& [_, mouseButton] : mouseButtons_)
-        {
-            mouseButton.state = ButtonState::Up;
-
-            if (mouseButton.isDown)
-            {
-                if (auto heldTime = now - mouseButton.pressTime; heldTime >= holdThreshold_)
-                {
-                    mouseButton.state = ButtonState::Held;
-                }
-                else
-                {
-                    mouseButton.state = ButtonState::Down;
-                }
-            }
-            else
-            {
-                if (mouseButton.wasDown)
-                {
-                    if (auto heldTime = now - mouseButton.pressTime; heldTime < holdThreshold_)
-                    {
-                        mouseButton.state = ButtonState::Clicked;
-                    }
-                    else
-                    {
-                        mouseButton.state = ButtonState::Released;
-                    }
-                }
-            }
-            mouseButton.wasDown = mouseButton.isDown;
-        }
-
-        // keyboard
-        // ReSharper disable once CppUseElementsView
-        for (auto& [_, keyboardButton] : keyboardButtons_)
-        {
-            keyboardButton.state = ButtonState::Up;
-
-            if (keyboardButton.isDown)
-            {
-                if (auto heldTime = now - keyboardButton.pressTime; heldTime >= holdThreshold_)
-                {
-                    keyboardButton.state = ButtonState::Held;
-                }
-                else
-                {
-                    keyboardButton.state = ButtonState::Down;
-                }
-            }
-            else
-            {
-                if (keyboardButton.wasDown)
-                {
-                    if (auto heldTime = now - keyboardButton.pressTime; heldTime < holdThreshold_)
-                    {
-                        keyboardButton.state = ButtonState::Clicked;
-                    }
-                    else
-                    {
-                        keyboardButton.state = ButtonState::Released;
-                    }
-                }
-            }
-            keyboardButton.wasDown = keyboardButton.isDown;
-        }
-
-        // gamepads (per-joystick)
-        // ReSharper disable once CppUseElementsView
-        for (auto& [jid, buttonsMap] : gamepadButtons_)
-        {
-            // ReSharper disable once CppUseElementsView
-            for (auto& [btn, gamepadButton] : buttonsMap)
-            {
-                gamepadButton.state = ButtonState::Up;
-
-                if (gamepadButton.isDown)
-                {
-                    if (auto heldTime = now - gamepadButton.pressTime; heldTime >= holdThreshold_)
-                    {
-                        gamepadButton.state = ButtonState::Held;
-                    }
-                    else
-                    {
-                        gamepadButton.state = ButtonState::Down;
-                    }
-                }
-                else
-                {
-                    if (gamepadButton.wasDown)
-                    {
-                        if (auto heldTime = now - gamepadButton.pressTime; heldTime < holdThreshold_)
-                        {
-                            gamepadButton.state = ButtonState::Clicked;
-                        }
-                        else
-                        {
-                            gamepadButton.state = ButtonState::Released;
-                        }
-                    }
-                }
-                gamepadButton.wasDown = gamepadButton.isDown;
-            }
-        }
+        updateGamepads(now);
+        updateMouseButtons(now);
+        updateKeyboardButtons(now);
     }
 
     bool InputManager::isClicked(const SDL_Keycode key) const
@@ -374,15 +272,13 @@ namespace psyengine
 
     float InputManager::getAxisNormalized(const SDL_GamepadAxis gamepadAxis, const SDL_JoystickID joystickId) const
     {
-        // use positive max for division to keep -1..1 roughly symmetric
-        static constexpr auto JOYSTICK_MAX = static_cast<float>(SDL_JOYSTICK_AXIS_MAX); // 32767
+        static constexpr float INV_POS = 1.0f / static_cast<float>(SDL_JOYSTICK_AXIS_MAX);
+        static constexpr float INV_NEG = 1.0f / static_cast<float>(-SDL_JOYSTICK_AXIS_MIN);
 
-        const auto raw = getAxisRaw(gamepadAxis, joystickId);
-        if (raw == 0)
-        {
-            return 0.0f;
-        }
-        return static_cast<float>(raw) / JOYSTICK_MAX;
+        const Sint16 raw = getAxisRaw(gamepadAxis, joystickId);
+        const float scale = (raw >= 0) ? INV_POS : INV_NEG;
+
+        return static_cast<float>(raw) * scale;
     }
 
     void InputManager::setHoldThreshold(const float seconds)
@@ -480,5 +376,117 @@ namespace psyengine
     std::string InputManager::getGamepadAxisName(const SDL_GamepadAxis axis)
     {
         return {SDL_GetGamepadStringForAxis(axis)};
+    }
+
+    void InputManager::updateGamepads(const time::TimePoint& now)
+    {
+        // ReSharper disable once CppUseElementsView
+        for (auto& [jid, buttonsMap] : gamepadButtons_)
+        {
+            // ReSharper disable once CppUseElementsView
+            for (auto& [btn, gamepadButton] : buttonsMap)
+            {
+                gamepadButton.state = ButtonState::Up;
+
+                if (gamepadButton.isDown)
+                {
+                    if (auto heldTime = now - gamepadButton.pressTime; heldTime >= holdThreshold_)
+                    {
+                        gamepadButton.state = ButtonState::Held;
+                    }
+                    else
+                    {
+                        gamepadButton.state = ButtonState::Down;
+                    }
+                }
+                else
+                {
+                    if (gamepadButton.wasDown)
+                    {
+                        if (auto heldTime = now - gamepadButton.pressTime; heldTime < holdThreshold_)
+                        {
+                            gamepadButton.state = ButtonState::Clicked;
+                        }
+                        else
+                        {
+                            gamepadButton.state = ButtonState::Released;
+                        }
+                    }
+                }
+                gamepadButton.wasDown = gamepadButton.isDown;
+            }
+        }
+    }
+
+    void InputManager::updateMouseButtons(const time::TimePoint& now)
+    {
+        // ReSharper disable once CppUseElementsView
+        for (auto& [_, mouseButton] : mouseButtons_)
+        {
+            mouseButton.state = ButtonState::Up;
+
+            if (mouseButton.isDown)
+            {
+                if (auto heldTime = now - mouseButton.pressTime; heldTime >= holdThreshold_)
+                {
+                    mouseButton.state = ButtonState::Held;
+                }
+                else
+                {
+                    mouseButton.state = ButtonState::Down;
+                }
+            }
+            else
+            {
+                if (mouseButton.wasDown)
+                {
+                    if (auto heldTime = now - mouseButton.pressTime; heldTime < holdThreshold_)
+                    {
+                        mouseButton.state = ButtonState::Clicked;
+                    }
+                    else
+                    {
+                        mouseButton.state = ButtonState::Released;
+                    }
+                }
+            }
+            mouseButton.wasDown = mouseButton.isDown;
+        }
+    }
+
+    void InputManager::updateKeyboardButtons(const time::TimePoint& now)
+    {
+        // ReSharper disable once CppUseElementsView
+        for (auto& [_, keyboardButton] : keyboardButtons_)
+        {
+            keyboardButton.state = ButtonState::Up;
+
+            if (keyboardButton.isDown)
+            {
+                if (auto heldTime = now - keyboardButton.pressTime; heldTime >= holdThreshold_)
+                {
+                    keyboardButton.state = ButtonState::Held;
+                }
+                else
+                {
+                    keyboardButton.state = ButtonState::Down;
+                }
+            }
+            else
+            {
+                if (keyboardButton.wasDown)
+                {
+                    if (auto heldTime = now - keyboardButton.pressTime; heldTime < holdThreshold_)
+                    {
+                        keyboardButton.state = ButtonState::Clicked;
+                    }
+                    else
+                    {
+                        keyboardButton.state = ButtonState::Released;
+                    }
+                }
+            }
+            keyboardButton.wasDown = keyboardButton.isDown;
+        }
     }
 }
