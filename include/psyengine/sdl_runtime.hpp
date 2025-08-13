@@ -21,8 +21,8 @@ namespace psyengine
      * - A main loop combining fixed-step updates (for deterministic simulation/physics) and variable-step updates for rendering.
      * - Event processing and advanced input handling, delegating input events to the input manager and forwarding all events
      *   to the state manager.
-     * - Coordination with a state manager that hosts game/application states; SdlRuntime calls into it for handleEvent,
-     *   fixedUpdate, update, and render.
+     * - Coordination with a state manager that hosts game/application states.
+     *   SdlRuntime calls into it for handleEvent, fixedUpdate, update, and render.
      * - Lag control: caps the number of fixed updates per frame and drops excess steps while preserving the interpolation phase.
      *
      * Typical usage:

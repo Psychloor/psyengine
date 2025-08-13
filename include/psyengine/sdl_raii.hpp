@@ -13,6 +13,11 @@
 
 namespace psyengine::raii
 {
+    /**
+     * A custom deleter for SDL_Window objects used in conjunction with smart pointers.
+     * Ensures that SDL_Window resources are properly released using SDL_DestroyWindow when
+     * the managed pointer goes out of scope.
+     */
     struct SdlWindowDestroyer
     {
         void operator()(SDL_Window* window) const
@@ -21,6 +26,11 @@ namespace psyengine::raii
         }
     };
 
+    /**
+     * A custom deleter for managing the destruction of SDL_Renderer objects.
+     * Ensures proper cleanup of an SDL_Renderer by calling SDL_DestroyRenderer
+     * when the managed renderer goes out of scope.
+     */
     struct SdlRendererDestroyer
     {
         void operator()(SDL_Renderer* renderer) const
@@ -29,6 +39,11 @@ namespace psyengine::raii
         }
     };
 
+    /**
+     * A custom deleter for SDL_Texture objects, ensuring proper cleanup of textures when they are no longer needed.
+     * This is designed to be used with smart pointers, such as std::shared_ptr or std::unique_ptr, for automatic
+     * resource management of SDL_Texture instances.
+     */
     struct SdlTextureDestroyer
     {
         void operator()(SDL_Texture* texture) const
@@ -37,6 +52,11 @@ namespace psyengine::raii
         }
     };
 
+    /**
+     * A custom deleter for SDL_Surface objects. Ensures proper cleanup of
+     * SDL_Surface resources by calling SDL_FreeSurface when the surface
+     * is no longer in use.
+     */
     struct SdlSurfaceDestroyer
     {
         void operator()(SDL_Surface* surface) const
@@ -45,6 +65,11 @@ namespace psyengine::raii
         }
     };
 
+    /**
+     * A custom deleter for MIX_Mixer objects, used to manage the lifetime of audio mixer resources.
+     * Ensures the proper cleanup of MIX_Mixer by invoking MIX_DestroyMixer when the mixer is no longer needed.
+     * Designed to be used with smart pointers for automatic resource management of audio mixers in SDL_mixer.
+     */
     struct SdlMixerDestroyer
     {
         void operator()(MIX_Mixer* mixer) const
@@ -53,6 +78,12 @@ namespace psyengine::raii
         }
     };
 
+    /**
+     * A custom deleter used to manage the lifetime of SDL_ttf resources, such as TTF_Font.
+     * Ensures that the associated SDL_ttf resource is properly released when it is no longer necessary.
+     *
+     * Designed to be used with smart pointers for automatic memory management of SDL_ttf objects.
+     */
     struct SdlTtfDestroyer
     {
         void operator()(TTF_Font* font) const
@@ -60,11 +91,6 @@ namespace psyengine::raii
             TTF_CloseFont(font);
         }
     };
-
-    inline std::shared_ptr<SDL_Texture> CreateSharedTextureFromSurface(SDL_Renderer* renderer, SDL_Surface* surface)
-    {
-        return {SDL_CreateTextureFromSurface(renderer, surface), SdlTextureDestroyer()};
-    }
 
     using SdlWindowPtr = std::unique_ptr<SDL_Window, SdlWindowDestroyer>;
     using SdlRendererPtr = std::unique_ptr<SDL_Renderer, SdlRendererDestroyer>;
