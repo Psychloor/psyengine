@@ -18,28 +18,28 @@ namespace psyengine::rand
     {
 
         /**
- * @brief Specialization of the HasStateSize trait for types that do not provide a `state_size` member.
- *
- * This struct is the default implementation of the HasStateSize trait and inherits from `std::false_type`.
- * It represents the absence of a `state_size` member in the specified type.
- *
- * @tparam T The type being checked for a `state_size` member.
- * @tparam U A placeholder template parameter for SFINAE defaults to `void`.
- */
+         * @brief Specialization of the HasStateSize trait for types that do not provide a `state_size` member.
+         *
+         * This struct is the default implementation of the HasStateSize trait and inherits from `std::false_type`.
+         * It represents the absence of a `state_size` member in the specified type.
+         *
+         * @tparam T The type being checked for a `state_size` member.
+         * @tparam U A placeholder template parameter for SFINAE defaults to `void`.
+         */
         template <typename T, typename U = void>
         struct HasStateSize : std::false_type
         {
         };
 
         /**
- * @brief Trait to detect whether a type provides a `state_size` member.
- *
- * Specialization for types that define a `state_size` member. When a type `T` has a
- * `state_size` member, this specialization inherits from `std::true_type`, effectively
- * evaluating to true for trait checks.
- *
- * @tparam T The type to be checked for the presence of a `state_size` member.
- */
+         * @brief Trait to detect whether a type provides a `state_size` member.
+         *
+         * Specialization for types that define a `state_size` member. When a type `T` has a
+         * `state_size` member, this specialization inherits from `std::true_type`, effectively
+         * evaluating to true for trait checks.
+         *
+         * @tparam T The type to be checked for the presence of a `state_size` member.
+         */
         template <typename T>
         struct HasStateSize<T, std::void_t<decltype(T::state_size)>> : std::true_type
         {
@@ -58,15 +58,15 @@ namespace psyengine::rand
 
 
         /**
- * @brief Computes and returns the number of 32-bit words to use for seeding a random number generator (RNG) engine.
- *
- * @tparam Engine The RNG engine type to consider. If the type has a `state_size` member,
- * its value is used. Otherwise, a default value of 16 (representing 512 bits of seed material) is returned.
- *
- * @return The number of 32-bit words required for seeding the specified Engine type. If `state_size` is
- * defined for the Engine, its value is used. In the absence of `state_size`, a default heuristic of 16 words
- * is applied to ensure sufficient diffusion of randomness while maintaining computational efficiency.
- */
+         * @brief Computes and returns the number of 32-bit words to use for seeding a random number generator (RNG) engine.
+         *
+         * @tparam Engine The RNG engine type to consider. If the type has a `state_size` member,
+         * its value is used. Otherwise, a default value of 16 (representing 512 bits of seed material) is returned.
+         *
+         * @return The number of 32-bit words required for seeding the specified Engine type. If `state_size` is
+         * defined for the Engine, its value is used. In the absence of `state_size`, a default heuristic of 16 words
+         * is applied to ensure sufficient diffusion of randomness while maintaining computational efficiency.
+         */
         template <typename Engine>
         constexpr std::size_t SeedWordCount()
         {
