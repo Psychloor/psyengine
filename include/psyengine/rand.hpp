@@ -17,30 +17,30 @@ namespace psyengine::rand
     namespace detail
     {
 
-        template <typename T, typename U = void>
         /**
-         * @brief Specialization of the HasStateSize trait for types that do not provide a `state_size` member.
-         *
-         * This struct is the default implementation of the HasStateSize trait and inherits from `std::false_type`.
-         * It represents the absence of a `state_size` member in the specified type.
-         *
-         * @tparam T The type being checked for a `state_size` member.
-         * @tparam U A placeholder template parameter for SFINAE defaults to `void`.
-         */
+ * @brief Specialization of the HasStateSize trait for types that do not provide a `state_size` member.
+ *
+ * This struct is the default implementation of the HasStateSize trait and inherits from `std::false_type`.
+ * It represents the absence of a `state_size` member in the specified type.
+ *
+ * @tparam T The type being checked for a `state_size` member.
+ * @tparam U A placeholder template parameter for SFINAE defaults to `void`.
+ */
+        template <typename T, typename U = void>
         struct HasStateSize : std::false_type
         {
         };
 
-        template <typename T>
         /**
-         * @brief Trait to detect whether a type provides a `state_size` member.
-         *
-         * Specialization for types that define a `state_size` member. When a type `T` has a
-         * `state_size` member, this specialization inherits from `std::true_type`, effectively
-         * evaluating to true for trait checks.
-         *
-         * @tparam T The type to be checked for the presence of a `state_size` member.
-         */
+ * @brief Trait to detect whether a type provides a `state_size` member.
+ *
+ * Specialization for types that define a `state_size` member. When a type `T` has a
+ * `state_size` member, this specialization inherits from `std::true_type`, effectively
+ * evaluating to true for trait checks.
+ *
+ * @tparam T The type to be checked for the presence of a `state_size` member.
+ */
+        template <typename T>
         struct HasStateSize<T, std::void_t<decltype(T::state_size)>> : std::true_type
         {
         };
@@ -57,17 +57,17 @@ namespace psyengine::rand
         };
 
 
-        template <typename Engine>
         /**
-         * @brief Computes and returns the number of 32-bit words to use for seeding a random number generator (RNG) engine.
-         *
-         * @tparam Engine The RNG engine type to consider. If the type has a `state_size` member,
-         * its value is used. Otherwise, a default value of 16 (representing 512 bits of seed material) is returned.
-         *
-         * @return The number of 32-bit words required for seeding the specified Engine type. If `state_size` is
-         * defined for the Engine, its value is used. In the absence of `state_size`, a default heuristic of 16 words
-         * is applied to ensure sufficient diffusion of randomness while maintaining computational efficiency.
-         */
+ * @brief Computes and returns the number of 32-bit words to use for seeding a random number generator (RNG) engine.
+ *
+ * @tparam Engine The RNG engine type to consider. If the type has a `state_size` member,
+ * its value is used. Otherwise, a default value of 16 (representing 512 bits of seed material) is returned.
+ *
+ * @return The number of 32-bit words required for seeding the specified Engine type. If `state_size` is
+ * defined for the Engine, its value is used. In the absence of `state_size`, a default heuristic of 16 words
+ * is applied to ensure sufficient diffusion of randomness while maintaining computational efficiency.
+ */
+        template <typename Engine>
         constexpr std::size_t SeedWordCount()
         {
             if constexpr (HAS_STATE_SIZE_V<Engine>)
@@ -94,11 +94,26 @@ namespace psyengine::rand
 
             return {std::begin(seedData), std::end(seedData)};
         }
+
+        /**
+         * @brief Applies a series of bitwise and multiplication operations to mix the bits of a 64-bit unsigned integer.
+         *
+         * This function performs a bitwise manipulation technique commonly used in hash algorithms
+         * to mix bits of the input number, ensuring a more uniform distribution of hash values.
+         *
+         * @param x The 64-bit unsigned integer to be mixed.
+         * @return The mixed 64-bit unsigned integer.
+         */
+        inline std::uint64_t Mix64(std::uint64_t x)
+        {
+            x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9ull;
+            x = (x ^ (x >> 27)) * 0x94D049BB133111EBull;
+            x ^= (x >> 31);
+            return x;
+        }
+
     } // namespace detail
 
-    template <typename Engine>
-        requires (std::uniform_random_bit_generator<Engine> &&
-            detail::SeedSeqConstructibleOrSeedable<Engine>)
     /**
      * @brief Creates and returns a seeded random number generator (RNG) of the specified Engine type.
      *
@@ -114,6 +129,9 @@ namespace psyengine::rand
      * accidentally discarded, ensuring robust random number generation. The randomness quality
      * depends on the underlying implementation of std::random_device.
      */
+    template <typename Engine>
+        requires (std::uniform_random_bit_generator<Engine> &&
+            detail::SeedSeqConstructibleOrSeedable<Engine>)
     [[nodiscard]] Engine MakeSeededRng()
     {
         if constexpr (auto seq = detail::MakeSeedSeq<Engine>();
@@ -129,9 +147,6 @@ namespace psyengine::rand
         }
     }
 
-    template <typename Engine>
-        requires (std::uniform_random_bit_generator<Engine> &&
-            detail::SeedSeqConstructibleOrSeedable<Engine>)
     /**
      * @brief Creates and returns a seeded random number generator (RNG) of the specified Engine type.
      *
@@ -150,6 +165,9 @@ namespace psyengine::rand
      * discarded. The quality and randomness of the RNG depend on the underlying std::random_device
      * implementation.
      */
+    template <typename Engine>
+        requires (std::uniform_random_bit_generator<Engine> &&
+            detail::SeedSeqConstructibleOrSeedable<Engine>)
     [[nodiscard]] Engine MakeSeededRngWithWords(const std::size_t seedSize)
     {
         std::random_device rd;
@@ -170,53 +188,42 @@ namespace psyengine::rand
         }
     }
 
-
-    template <typename Engine>
-        requires (std::uniform_random_bit_generator<Engine> &&
-            detail::SeedSeqConstructibleOrSeedable<Engine>)
     /**
-     * @brief Creates and returns a custom-seeded random number generator engine.
+     * @brief Creates a custom-seeded random number generator engine with hashed seed processing.
      *
-     * This function generates a random number generator engine of the specified type `Engine` that is
-     * seeded with a user-provided 64-bit integer seed. It internally uses a SplitMix64-like algorithm
-     * to expand the given 64-bit seed into the number of 32-bit words required by the engine's seed sequence.
+     * This function generates a random number generator engine of type `Engine` using a user-provided
+     * seed and an optional hasher. The provided seed is hashed into a 64-bit state, which is processed
+     * to produce a sequence of 32-bit integers for initializing the random number generator engine.
      *
-     * If the `Engine` type supports direct construction with an ` std::seed_seq ` instance, it is used to construct
-     * and initialize the engine. Otherwise, the engine is default-constructed and seeded explicitly.
-     *
-     * @tparam Engine The type of the random number generator being created. Must be compatible with `std::seed_seq`.
-     * @param userSeed A 64-bit seed value provided by the user for initializing the random number generator.
-     * @return A constructed and seeded instance of the `Engine` type.
-     *
-     * @details
-     * The splitmix64-like generator function `next32` generates 32-bit words by transforming the input `userSeed`
-     * through a series of bitwise and arithmetic operations. The resulting words are used to populate a
-     * `std::vector` of the required size for the seed sequence.
-     *
-     * The number of 32-bit words required is determined by `detail::SeedWordCount<Engine>()`. These words
-     * are used to initialize a `std::seed_seq`, which seeds the engine. The function selects the appropriate
-     * seeding method based on the engine's construction requirements.
+     * @param seed The seed to initialize the random number generator, which will be hashed.
+     * @param hasher An optional custom hasher to transform the seed. Defaults to the default-constructed `THasher`.
+     * @return A random number generator engine of type `Engine` initialized using the hashed seed.
      */
-    [[nodiscard]] Engine MakeCustomSeededRng(const std::uint64_t userSeed)
+    template <typename Engine, typename Seed, typename THasher = std::hash<Seed>>
+        requires (std::uniform_random_bit_generator<Engine> &&
+            psyengine::rand::detail::SeedSeqConstructibleOrSeedable<Engine> &&
+            std::invocable<THasher, const Seed&>)
+    [[nodiscard]] Engine MakeCustomSeededRngHashed(const Seed& seed, THasher hasher = {})
     {
-        // Expand a single 64-bit seed into many 32-bit words with splitmix64
-        std::uint64_t sm = userSeed;
-        auto next32 = [&sm]() -> std::uint32_t
-        {
-            sm += 0x9E3779B97F4A7C15ull; // advance state by golden ratio
-            std::uint64_t z = sm;
-            z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ull; // mix
-            z = (z ^ (z >> 27)) * 0x94D049BB133111EBull; // mix
-            z ^= (z >> 31);
-            return static_cast<std::uint32_t>(z);
-        };
+        // Hash user-provided seed into a 64-bit state
+        auto state = static_cast<std::uint64_t>(hasher(seed));
+        // Strengthen the entropy distribution a bit
+        state = detail::Mix64(state);
 
-        constexpr std::size_t n = detail::SeedWordCount<Engine>();
+        // Expand into enough 32-bit words for Engine using splitmix64 progression
+        constexpr std::size_t n = psyengine::rand::detail::SeedWordCount<Engine>();
         std::vector<std::seed_seq::result_type> seedData;
         seedData.reserve(n);
-        std::generate_n(std::back_inserter(seedData), n, next32);
 
-        std::seed_seq seq(std::begin(seedData), std::end(seedData));
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            // advance state (golden ratio increment)
+            state += 0x9E3779B97F4A7C15ull;
+            const std::uint64_t z = psyengine::rand::detail::Mix64(state);
+            seedData.push_back(static_cast<std::uint32_t>(z)); // take 32-bit chunks
+        }
+
+        std::seed_seq seq(seedData.begin(), seedData.end());
         if constexpr (requires { Engine{seq}; })
         {
             return Engine(seq);
@@ -229,7 +236,46 @@ namespace psyengine::rand
         }
     }
 
+    /**
+     * @brief Creates a custom-seeded random number generator (RNG) engine using a range of elements.
+     *
+     * This method generates a seed by hashing and combining values from the given range,
+     * then constructs a random number generator using the resulting hashed seed.
+     *
+     * @tparam Engine The random number generator engine type to be created.
+     * @tparam Range The type of the input range containing elements.
+     * @tparam THasher The type of the hasher to be applied to each element in the range.
+     * @param items The input range of elements to be hashed and combined.
+     * @param elemHasher The hasher function or object to calculate a hash value for each element in the range.
+     * @return Returns a custom-seeded random number generator engine initialized with the combined seed.
+     */
+    template <typename Engine, typename Range, typename THasher>
+        requires (std::uniform_random_bit_generator<Engine> &&
+            psyengine::rand::detail::SeedSeqConstructibleOrSeedable<Engine> &&
+            requires(const Range& r) { std::begin(r); std::end(r); } &&
+            std::invocable<THasher, const std::ranges::range_value_t<Range>&>)
+    [[nodiscard]] Engine MakeCustomSeededRngHashedRange(const Range& items, THasher elemHasher)
+    {
+        std::uint64_t combined = 0xcbf29ce484222325ull; // FNV-1a offset basis as a simple start
+        for (const auto& v : items)
+        {
+            const auto h = static_cast<std::uint64_t>(elemHasher(v));
+            // simple 64-bit combine
+            combined ^= h + 0x9E3779B97F4A7C15ull + (combined << 6) + (combined >> 2);
+        }
 
+        // Reuse the single-seed version with a lambda hasher
+        struct PassThroughHash
+        {
+            std::uint64_t h;
+            std::uint64_t operator()(std::uint64_t) const noexcept { return h; }
+        };
+
+        return MakeCustomSeededRngHashed<Engine, std::uint64_t>(combined, PassThroughHash{combined});
+    }
+
+
+    // Quick utility functions for the most common cases
     using Mersenne32 = std::mt19937;
     using Mersenne64 = std::mt19937_64;
 
@@ -263,7 +309,38 @@ namespace psyengine::rand
      */
     inline auto MakeMersenne64() { return MakeSeededRng<Mersenne64>(); }
 
-    inline auto MakeMersenne32CustomSeed(const std::uint64_t seed) { return MakeCustomSeededRng<Mersenne32>(seed); }
-    inline auto MakeMersenne64CustomSeed(const std::uint64_t seed) { return MakeCustomSeededRng<Mersenne64>(seed); }
+    /**
+     * @brief Creates a 32-bit Mersenne Twister random number generator with a custom seeded hash.
+     *
+     * This function generates a Mersenne64 random number generator seeded using the given seed
+     * and an optional custom hash function.
+     *
+     * @param seed The seed value used for initializing the random number generator.
+     * @param hasher The custom hash function used for seeding. Defaults to an empty instance of the specified type.
+     * @return A Mersenne64 random number generator initialized with the provided seed and hash function.
+     */
+    template <typename Seed, typename THasher = std::hash<Seed>>
+    auto MakeMersenne32CustomSeededHash(const Seed& seed, THasher hasher = {})
+    {
+        return MakeCustomSeededRngHashed<Mersenne32, Seed, THasher>(seed, hasher);
+    }
+
+    /**
+     * @brief Creates a 64-bit Mersenne Twister random number generator with a custom seeded hash.
+     *
+     * This function generates a Mersenne64 random number generator seeded using the given seed
+     * and an optional custom hash function.
+     *
+     * @param seed The seed value used for initializing the random number generator.
+     * @param hasher The custom hash function used for seeding. Defaults to an empty instance of the specified type.
+     * @return A Mersenne64 random number generator initialized with the provided seed and hash function.
+     */
+    template <typename Seed, typename THasher = std::hash<Seed>>
+    auto MakeMersenne64CustomSeededHash(const Seed& seed, THasher hasher = {})
+    {
+        return MakeCustomSeededRngHashed<Mersenne64, Seed, THasher>(seed, hasher);
+    }
+
 } // namespace utils::rand
+
 #endif //PSYENGINE_RAND_HPP
