@@ -44,14 +44,14 @@ namespace psyengine
         states_.back()->update(deltaTime);
     }
 
-    void StateManager::render(SDL_Renderer* const renderer, const float alpha) const
+    void StateManager::render(SDL_Renderer* const renderer, const float interpolationFactor) const
     {
         if (states_.empty())
         {
             return;
         }
 
-        states_.back()->render(renderer, alpha);
+        states_.back()->render(renderer, interpolationFactor);
     }
 
     bool StateManager::pushState(std::unique_ptr<BaseState> state)

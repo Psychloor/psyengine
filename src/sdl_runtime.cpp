@@ -2,7 +2,7 @@
 // Created by blomq on 2025-08-11.
 //
 
-#include "psyengine/sdl_game.hpp"
+#include "psyengine/sdl_runtime.hpp"
 
 #include <cassert>
 
@@ -15,8 +15,7 @@
 
 namespace psyengine
 {
-
-    SdlGame::~SdlGame()
+    SdlRuntime::~SdlRuntime()
     {
         StateManager::instance().clear();
 
@@ -31,7 +30,7 @@ namespace psyengine
         SDL_Quit();
     }
 
-    bool SdlGame::init(const std::string& title, const int width, const int height, const bool resizeableWindow)
+    bool SdlRuntime::init(const std::string& title, const int width, const int height, const bool resizeableWindow)
     {
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD))
         {
@@ -74,7 +73,7 @@ namespace psyengine
     }
 
 
-    void SdlGame::run(const std::chrono::duration<double> fixedTimeStep, const size_t maxFixedUpdatesPerTick, const std::chrono::duration<double> maxFrameTime)
+    void SdlRuntime::run(const std::chrono::duration<double> fixedTimeStep, const size_t maxFixedUpdatesPerTick, const std::chrono::duration<double> maxFrameTime)
     {
         assert(maxFixedUpdatesPerTick > 0 && "Max updates per tick must be greater than 0");
 
@@ -136,60 +135,60 @@ namespace psyengine
             update(frameDelta);
 
             // Interpolation factor for smooth rendering
-            const auto alpha = static_cast<float>(accumulatedTime / tickPeriod);
-            render(alpha);
+            const auto interpolationFactor = static_cast<float>(accumulatedTime / tickPeriod);
+            render(interpolationFactor);
 
             // Yield a bit to reduce cpu usage
             SDL_Delay(1);
         }
     }
 
-    bool SdlGame::setWindowTitle(const std::string& title) const
+    bool SdlRuntime::setWindowTitle(const std::string& title) const
     {
         return SDL_SetWindowTitle(window_.get(), title.c_str());
     }
 
-    bool SdlGame::setWindowSize(const int width, const int height) const
+    bool SdlRuntime::setWindowSize(const int width, const int height) const
     {
         return SDL_SetWindowSize(window_.get(), width, height);
     }
 
-    bool SdlGame::setWindowFullscreen(const bool fullscreen) const
+    bool SdlRuntime::setWindowFullscreen(const bool fullscreen) const
     {
         return SDL_SetWindowFullscreen(window_.get(), fullscreen);
     }
 
-    bool SdlGame::setWindowVsync(const bool vsync) const
+    bool SdlRuntime::setWindowVsync(const bool vsync) const
     {
         return SDL_SetWindowSurfaceVSync(window_.get(), vsync ? 1 : SDL_WINDOW_SURFACE_VSYNC_DISABLED);
     }
 
-    void SdlGame::quit()
+    void SdlRuntime::quit()
     {
         running_ = false;
     }
 
-    bool SdlGame::isRunning() const
+    bool SdlRuntime::isRunning() const
     {
         return running_;
     }
 
-    bool SdlGame::isLagging() const
+    bool SdlRuntime::isLagging() const
     {
         return lagging_;
     }
 
-    SDL_Window* SdlGame::window() const
+    SDL_Window* SdlRuntime::window() const
     {
         return window_.get();
     }
 
-    SDL_Renderer* SdlGame::renderer() const
+    SDL_Renderer* SdlRuntime::renderer() const
     {
         return renderer_.get();
     }
 
-    void SdlGame::handleEvents()
+    void SdlRuntime::handleEvents()
     {
         SDL_Event event;
 
@@ -221,24 +220,24 @@ namespace psyengine
         }
     }
 
-    void SdlGame::fixedUpdate(const double deltaTime)
+    void SdlRuntime::fixedUpdate(const double deltaTime)
     {
         StateManager::instance().fixedUpdate(deltaTime);
     }
 
-    void SdlGame::update(const double deltaTime)
+    void SdlRuntime::update(const double deltaTime)
     {
         StateManager::instance().update(deltaTime);
     }
 
-    void SdlGame::render(const float alpha) const
+    void SdlRuntime::render(const float interpolationFactor) const
     {
         // CornFlowerBlue
         SDL_SetRenderDrawColorFloat(renderer_.get(), 0.392f, 0.584f, 0.929f, 1.0f);
         SDL_RenderClear(renderer_.get());
         SDL_SetRenderDrawColorFloat(renderer_.get(), 1.0f, 1.0f, 1.0f, 1.0f);
 
-        StateManager::instance().render(renderer_.get(), alpha);
+        StateManager::instance().render(renderer_.get(), interpolationFactor);
 
         SDL_RenderPresent(renderer_.get());
     }
