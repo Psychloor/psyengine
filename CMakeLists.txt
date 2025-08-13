@@ -48,6 +48,12 @@ set_target_properties(psyengine PROPERTIES
         CXX_EXTENSIONS OFF
 )
 
+if(MSVC)
+    target_compile_options(psyengine PRIVATE /W4 /WX)
+else()
+    target_compile_options(psyengine PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
 # Public includes for consumers; build interface points to your include/ folder
 target_include_directories(psyengine
         PUBLIC

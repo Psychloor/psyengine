@@ -114,21 +114,21 @@ namespace psyengine
                 onButtonPress(e.key.key, Clock::now());
             break;
         case SDL_EVENT_KEY_UP:
-            onButtonRelease(e.key.key, Clock::now());
+            onButtonRelease(e.key.key);
             break;
 
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
             onButtonPress(static_cast<MouseButton>(e.button.button), Clock::now());
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
-            onButtonRelease(static_cast<MouseButton>(e.button.button), Clock::now());
+            onButtonRelease(static_cast<MouseButton>(e.button.button));
             break;
 
         case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
             onButtonPress(static_cast<SDL_GamepadButton>(e.gbutton.button), Clock::now(), e.gbutton.which);
             break;
         case SDL_EVENT_GAMEPAD_BUTTON_UP:
-            onButtonRelease(static_cast<SDL_GamepadButton>(e.gbutton.button), Clock::now(), e.gbutton.which);
+            onButtonRelease(static_cast<SDL_GamepadButton>(e.gbutton.button), e.gbutton.which);
             break;
 
         case SDL_EVENT_GAMEPAD_AXIS_MOTION:
@@ -339,7 +339,7 @@ namespace psyengine
         btn.pressTime = now;
     }
 
-    void InputManager::onButtonRelease(const SDL_Keycode key, const TimePoint now)
+    void InputManager::onButtonRelease(const SDL_Keycode key)
     {
         auto& btn = keyboardButtons_[key];
         btn.isDown = false;
@@ -353,7 +353,7 @@ namespace psyengine
         btn.pressTime = now;
     }
 
-    void InputManager::onButtonRelease(const SDL_GamepadButton gamepadButton, const TimePoint now,
+    void InputManager::onButtonRelease(const SDL_GamepadButton gamepadButton,
                                        const SDL_JoystickID joystickId)
     {
         auto& btn = gamepadButtons_[joystickId][gamepadButton];
@@ -367,7 +367,7 @@ namespace psyengine
         btn.pressTime = now;
     }
 
-    void InputManager::onButtonRelease(const MouseButton mouseButton, const TimePoint now)
+    void InputManager::onButtonRelease(const MouseButton mouseButton)
     {
         auto& btn = mouseButtons_[mouseButton];
         btn.isDown = false;

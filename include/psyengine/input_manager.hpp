@@ -169,7 +169,11 @@ namespace psyengine
         InputManager& operator=(InputManager&& other) noexcept = delete;
 
     private:
-        InputManager() : holdThreshold_(std::chrono::milliseconds(300)) {}
+        InputManager() :
+            holdThreshold_(std::chrono::milliseconds(300))
+        {
+        }
+
         ~InputManager() = default;
 
         std::unordered_map<MouseButton, ButtonData> mouseButtons_;
@@ -188,15 +192,15 @@ namespace psyengine
 
         // ---- event handlers ----
         void onButtonPress(SDL_Keycode key, TimePoint now);
-        void onButtonRelease(SDL_Keycode key, TimePoint now);
+        void onButtonRelease(SDL_Keycode key);
 
         void onButtonPress(SDL_GamepadButton gamepadButton, TimePoint now,
                            SDL_JoystickID joystickId = 0);
-        void onButtonRelease(SDL_GamepadButton gamepadButton, TimePoint now,
+        void onButtonRelease(SDL_GamepadButton gamepadButton,
                              SDL_JoystickID joystickId = 0);
 
         void onButtonPress(MouseButton mouseButton, TimePoint now);
-        void onButtonRelease(MouseButton mouseButton, TimePoint now);
+        void onButtonRelease(MouseButton mouseButton);
 
         // ---- getters ----
         [[nodiscard]] ButtonState getButtonState(SDL_GamepadButton button,
