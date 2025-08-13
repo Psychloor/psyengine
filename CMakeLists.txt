@@ -31,7 +31,7 @@ file(GLOB_RECURSE PSY_ENGINE_HEADER_FILES
         ${PROJECT_SOURCE_DIR}/include/psyengine/*.tpp
 )
 
-add_subdirectory(external)
+add_subdirectory(external EXCLUDE_FROM_ALL)
 
 if (PSYENGINE_EXAMPLES)
     add_subdirectory(examples)
