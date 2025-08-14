@@ -19,6 +19,11 @@ namespace psyengine
     {
         StateManager::instance().clear();
 
+        if (audioDevice_ != 0)
+        {
+            SDL_CloseAudioDevice(audioDevice_);
+        }
+
         // Ensure SDL objects are destroyed before SDL_Quit
         renderer_.reset();
         window_.reset();
@@ -41,6 +46,13 @@ namespace psyengine
         if (!TTF_Init())
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "TTF_Init failed: %s", SDL_GetError());
+            return false;
+        }
+
+        audioDevice_ = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+        if (audioDevice_ == 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_OpenAudioDevice failed: %s", SDL_GetError());
             return false;
         }
 

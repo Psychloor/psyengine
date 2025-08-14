@@ -11,7 +11,6 @@
 
 namespace psyengine
 {
-
     /**
      * @class SdlRuntime
      * @brief SDL-backed application runtime that owns initialization, the main loop, input dispatch, and rendering.
@@ -73,7 +72,8 @@ namespace psyengine
          * @param maxFixedUpdatesPerTick The maximum allowed fixed updates to process in a single frame.
          * @param maxFrameTime The maximum frame time to cap the elapsed time between frames.
          */
-        void run(std::chrono::duration<double> fixedTimeStep, size_t maxFixedUpdatesPerTick = 10, std::chrono::duration<double> maxFrameTime = std::chrono::seconds(1));
+        void run(std::chrono::duration<double> fixedTimeStep, size_t maxFixedUpdatesPerTick = 10,
+                 std::chrono::duration<double> maxFrameTime = std::chrono::seconds(1));
 
         /// Sets the window title.
         /// @return true on success.
@@ -118,12 +118,13 @@ namespace psyengine
         /// Renders the current state with an interpolation factor in [0, 1].
         void render(float interpolationFactor) const;
 
-        bool running_{};  ///< Main loop flag.
-        bool lagging_{};  ///< Indicates we dropped fixed steps due to lag in the last frame.
+        bool running_{}; ///< Main loop flag.
+        bool lagging_{}; ///< Indicates we dropped fixed steps due to lag in the last frame.
 
 
         raii::SdlWindowPtr window_ = nullptr;
         raii::SdlRendererPtr renderer_ = nullptr;
+        SDL_AudioDeviceID audioDevice_ = 0;
     };
 }
 

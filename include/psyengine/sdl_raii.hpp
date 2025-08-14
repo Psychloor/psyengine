@@ -66,6 +66,19 @@ namespace psyengine::raii
     };
 
     /**
+     * A custom deleter for SDL_AudioDeviceID objects. Ensures that SDL audio device
+     * resources are properly released by calling SDL_CloseAudioDevice when the managed
+     * audio device goes out of scope.
+     */
+    struct SdlAudioDeviceDestroyer
+    {
+        void operator()(const SDL_AudioDeviceID device) const
+        {
+            SDL_CloseAudioDevice(device);
+        }
+    };
+
+    /**
      * A custom deleter for MIX_Mixer objects, used to manage the lifetime of audio mixer resources.
      * Ensures the proper cleanup of MIX_Mixer by invoking MIX_DestroyMixer when the mixer is no longer needed.
      * Designed to be used with smart pointers for automatic resource management of audio mixers in SDL_mixer.
