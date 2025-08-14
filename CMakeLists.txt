@@ -31,10 +31,10 @@ file(GLOB_RECURSE PSY_ENGINE_HEADER_FILES
         ${PROJECT_SOURCE_DIR}/include/psyengine/*.tpp
 )
 
-find_package(SDL REQUIRED CONFIG)
-find_package(SDL_image REQUIRED CONFIG)
-find_package(SDL_mixer REQUIRED CONFIG)
-find_package(SDL_ttf REQUIRED CONFIG)
+find_package(SDL3 CONFIG REQUIRED)
+find_package(SDL3_image CONFIG REQUIRED)
+find_package(SDL3_mixer CONFIG REQUIRED)
+find_package(SDL3_ttf CONFIG REQUIRED)
 
 if (PSYENGINE_EXAMPLES)
     add_subdirectory(examples)
