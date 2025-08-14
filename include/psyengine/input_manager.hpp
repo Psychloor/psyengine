@@ -35,7 +35,7 @@ namespace psyengine
 
         /**
          * @enum MouseButton
-         * @brief Represents the different buttons on a mouse.
+         * @brief Represents the different standard buttons on a mouse.
          *
          * The MouseButton enum provides a mapping of mouse buttons to SDL constants.
          * It is used to identify and differentiate between the left, right, middle,
@@ -162,7 +162,7 @@ namespace psyengine
          *
          * @param actionName The name of the action to bind to the gamepad button.
          * @param button The gamepad button to bind to the action.
-         * @param joystickId The ID of the joystick to which the binding applies.
+         * @param joystickId The ID of the joystick to which the binding applies. 0 means any
          */
         void bindActionGamepadButton(const std::string& actionName, SDL_GamepadButton button,
                                      SDL_JoystickID joystickId = 0);

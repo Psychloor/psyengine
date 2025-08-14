@@ -1,4 +1,4 @@
-﻿add_subdirectory(SDL EXCLUDE_FROM_ALL)
+﻿add_subdirectory(SDL)
 
 set(SDLTTF_VENDORED ON) # tell SDL_ttf to build its own dependencies
 add_subdirectory(SDL_ttf EXCLUDE_FROM_ALL)
