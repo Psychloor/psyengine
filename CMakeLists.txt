@@ -31,7 +31,10 @@ file(GLOB_RECURSE PSY_ENGINE_HEADER_FILES
         ${PROJECT_SOURCE_DIR}/include/psyengine/*.tpp
 )
 
-add_subdirectory(external EXCLUDE_FROM_ALL)
+find_package(SDL REQUIRED CONFIG)
+find_package(SDL_image REQUIRED CONFIG)
+find_package(SDL_mixer REQUIRED CONFIG)
+find_package(SDL_ttf REQUIRED CONFIG)
 
 if (PSYENGINE_EXAMPLES)
     add_subdirectory(examples)
@@ -75,10 +78,10 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
         PUBLIC
+        SDL3::SDL3
         SDL3_ttf::SDL3_ttf
         SDL3_mixer::SDL3_mixer
         SDL3_image::SDL3_image
-        SDL3::SDL3
 )
 
 if (PSYENGINE_INSTALL)
