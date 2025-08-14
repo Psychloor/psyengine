@@ -5,22 +5,27 @@
 #ifndef PSYENGINE_TIME_HPP
 #define PSYENGINE_TIME_HPP
 
+#include <concepts>
+#include <limits>
+
+#include <SDL3/SDL_timer.h>
+
 namespace psyengine::time
 {
-    static const double PERFORMANCE_TIMER_FREQUENCY = static_cast<double>(SDL_GetPerformanceFrequency());
     using TimePoint = Uint64;
 
-
-    [[nodiscard]] constexpr TimePoint Min()
+    /**
+     * Retrieves the performance counter frequency (ticks per second).
+     * The value is cached on the first call.
+     */
+    [[nodiscard]] inline TimePoint PerformanceFrequency() noexcept
     {
-        return 0;
+        static const TimePoint FREQ = SDL_GetPerformanceFrequency();
+        return FREQ;
     }
 
     /**
      * Retrieves the current performance counter-value.
-     * The performance counter is typically used for precise timing and measuring elapsed time.
-     *
-     * @return The current performance counter-value as a TimePoint.
      */
     [[nodiscard]] inline TimePoint Now() noexcept
     {
@@ -32,42 +37,76 @@ namespace psyengine::time
      *
      * @param start The starting time point.
      * @param end The ending time point.
-     * @return The elapsed time in seconds as a double.
+     * @return The elapsed time in seconds as T.
      */
-    [[nodiscard]] inline double Elapsed(const TimePoint& start, const TimePoint& end) noexcept
+    template<std::floating_point T>
+    [[nodiscard]] T Elapsed(const TimePoint start, const TimePoint end) noexcept
     {
-        return static_cast<double>(end - start) / PERFORMANCE_TIMER_FREQUENCY;
+        return static_cast<T>(end - start) / static_cast<T>(PerformanceFrequency());
     }
 
-    /**
+ /**
      * Calculates the elapsed time in seconds since a given time point.
      *
      * @param since The reference time point from which the elapsed time is calculated.
-     * @return The elapsed time in seconds as a double.
+     * @return The elapsed time in seconds as T.
      */
-    [[nodiscard]] inline double ElapsedSince(const TimePoint& since) noexcept
+    template<std::floating_point T>
+    [[nodiscard]] T ElapsedSince(const TimePoint since) noexcept
     {
-        return Elapsed(Now(), since);
+        return Elapsed<T>(since, Now());
     }
 
     /**
      * Computes the elapsed time between two time points and clamps the result to a maximum value.
      *
-     * This function calculates the elapsed time using the provided start and end time points.
-     * If the elapsed time exceeds the specified maximum duration, the result will be clamped
-     * to the value of maxSeconds. The elapsed time is measured in seconds.
-     *
      * @param start The starting time point.
      * @param end The ending time point.
-     * @param maxSeconds The maximum allowable duration in seconds. Defaults to 1.0.
-     * @return The elapsed time in seconds, clamped to maxSeconds if it exceeds the specified limit.
+     * @param maxSeconds The maximum allowable duration in seconds (same type as return).
+     * @return The elapsed time in seconds, clamped to maxSeconds.
      */
-    [[nodiscard]] inline double ElapsedClamped(const TimePoint& start, const TimePoint& end,
-                                               const double maxSeconds = 1.0) noexcept
+    template<std::floating_point T>
+    [[nodiscard]] T ElapsedClamped(const TimePoint start, const TimePoint end,
+                                          T maxSeconds = static_cast<T>(1)) noexcept
     {
-        const double dt = Elapsed(start, end);
+        const T dt = Elapsed<T>(start, end);
         return dt > maxSeconds ? maxSeconds : dt;
     }
+
+    /**
+     * Convert raw tick count to seconds.
+     */
+    template<std::floating_point T>
+    [[nodiscard]] T TicksToSeconds(TimePoint ticks) noexcept
+    {
+        return static_cast<T>(ticks) / static_cast<T>(PerformanceFrequency());
+    }
+
+    /**
+     * Convert seconds to raw tick count (rounded down).
+     */
+    template<std::floating_point T>
+    [[nodiscard]] TimePoint SecondsToTicks(T seconds) noexcept
+    {
+        return static_cast<TimePoint>(seconds * static_cast<T>(PerformanceFrequency()));
+    }
+
+    /**
+     * Retrieves the maximum possible value for a TimePoint.
+     */
+    [[nodiscard]] constexpr TimePoint Max() noexcept
+    {
+        return std::numeric_limits<TimePoint>::max();
+    }
+
+    /**
+     * Retrieves the minimum possible value of a TimePoint.
+     */
+    [[nodiscard]] constexpr TimePoint Min() noexcept
+    {
+        return std::numeric_limits<TimePoint>::min();
+    }
+
 }
 
 #endif //PSYENGINE_TIME_HPP

@@ -28,9 +28,6 @@ namespace psyengine
      */
     class InputManager
     {
-        using Clock = std::chrono::steady_clock;
-        using TimePoint = Clock::time_point;
-
         template <typename T, typename U>
         using GamePad = std::unordered_map<SDL_JoystickID, std::unordered_map<T, U>>;
 
@@ -90,7 +87,7 @@ namespace psyengine
         {
             bool isDown = false;
             bool wasDown = false;
-            TimePoint pressTime{};
+            time::TimePoint pressTime{};
             ButtonState state = ButtonState::Up;
         };
 
@@ -437,7 +434,7 @@ namespace psyengine
 
     private:
         InputManager() :
-            holdThreshold_(std::chrono::milliseconds(300))
+            holdThreshold_(0.3f)
         {
         }
 
@@ -451,22 +448,22 @@ namespace psyengine
 
         std::unordered_map<std::string, Action> actions_;
 
-        std::chrono::duration<float> holdThreshold_;
+        float holdThreshold_;
 
         // Helper to check each binding of an action with a callable that returns bool
         template <typename Func>
         bool forEachBinding(const std::string& actionName, Func&& func) const;
 
         // ---- event handlers ----
-        void onButtonPress(SDL_Keycode key, TimePoint now);
+        void onButtonPress(SDL_Keycode key, time::TimePoint now);
         void onButtonRelease(SDL_Keycode key);
 
-        void onButtonPress(SDL_GamepadButton gamepadButton, TimePoint now,
+        void onButtonPress(SDL_GamepadButton gamepadButton, time::TimePoint now,
                            SDL_JoystickID joystickId = 0);
         void onButtonRelease(SDL_GamepadButton gamepadButton,
                              SDL_JoystickID joystickId = 0);
 
-        void onButtonPress(MouseButton mouseButton, TimePoint now);
+        void onButtonPress(MouseButton mouseButton, time::TimePoint now);
         void onButtonRelease(MouseButton mouseButton);
 
         // ---- getters ----
