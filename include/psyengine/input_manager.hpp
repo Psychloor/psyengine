@@ -5,7 +5,6 @@
 #ifndef PSYENGINE_INPUT_MANAGER_HPP
 #define PSYENGINE_INPUT_MANAGER_HPP
 
-#include <chrono>
 #include <string>
 #include <unordered_map>
 #include <variant>
@@ -113,7 +112,7 @@ namespace psyengine
 
         struct MouseBinding
         {
-            MouseButton button;
+            Uint8 button;
             bool operator==(const MouseBinding& other) const = default;
         };
 
@@ -152,7 +151,7 @@ namespace psyengine
          * @param actionName The name of the action to bind the mouse button to.
          * @param button The mouse button to be associated with the action.
          */
-        void bindActionMouseButton(const std::string& actionName, MouseButton button);
+        void bindActionMouseButton(const std::string& actionName, Uint8 button);
 
         /**
          * @brief Binds a specified gamepad button to a named action for a specific joystick.
@@ -343,7 +342,7 @@ namespace psyengine
          * @param mouseButton The mouse button to check for a click event.
          * @return True if the specified mouse button was clicked; otherwise, false.
          */
-        [[nodiscard]] bool isClicked(MouseButton mouseButton) const;
+        [[nodiscard]] bool isClicked(Uint8 mouseButton) const;
 
         /**
          * @brief Checks if the specified mouse button is currently held down.
@@ -354,7 +353,7 @@ namespace psyengine
          * @param mouseButton The mouse button to check.
          * @return True if the mouse button is being held down, otherwise false.
          */
-        [[nodiscard]] bool isHeld(MouseButton mouseButton) const;
+        [[nodiscard]] bool isHeld(Uint8 mouseButton) const;
 
         /**
          * @brief Checks if the specified mouse button is currently pressed or held down.
@@ -365,7 +364,7 @@ namespace psyengine
          * @param mouseButton The mouse button to query.
          * @return True if the mouse button is pressed or held, otherwise false.
          */
-        [[nodiscard]] bool isDown(MouseButton mouseButton) const;
+        [[nodiscard]] bool isDown(Uint8 mouseButton) const;
 
         /**
          * @brief Checks if the specified mouse button is in the released state.
@@ -376,7 +375,7 @@ namespace psyengine
          * @param mouseButton The mouse button to query its release state.
          * @return True if the specified mouse button is released, false otherwise.
          */
-        [[nodiscard]] bool isReleased(MouseButton mouseButton) const;
+        [[nodiscard]] bool isReleased(Uint8 mouseButton) const;
 
         /**
          * @brief Retrieves the raw value of a specified gamepad axis for a given joystick.
@@ -440,7 +439,7 @@ namespace psyengine
 
         ~InputManager() = default;
 
-        std::unordered_map<MouseButton, ButtonData> mouseButtons_;
+        std::unordered_map<Uint8, ButtonData> mouseButtons_;
         std::unordered_map<SDL_Keycode, ButtonData> keyboardButtons_;
 
         GamePad<SDL_GamepadButton, ButtonData> gamepadButtons_;
@@ -463,14 +462,14 @@ namespace psyengine
         void onButtonRelease(SDL_GamepadButton gamepadButton,
                              SDL_JoystickID joystickId = 0);
 
-        void onButtonPress(MouseButton mouseButton, time::TimePoint now);
-        void onButtonRelease(MouseButton mouseButton);
+        void onButtonPress(Uint8 mouseButton, time::TimePoint now);
+        void onButtonRelease(Uint8 mouseButton);
 
         // ---- getters ----
         [[nodiscard]] ButtonState getButtonState(SDL_GamepadButton button,
                                                  SDL_JoystickID joystickId = 0) const;
         [[nodiscard]] ButtonState getButtonState(SDL_Keycode key) const;
-        [[nodiscard]] ButtonState getButtonState(MouseButton mouseButton) const;
+        [[nodiscard]] ButtonState getButtonState(Uint8 mouseButton) const;
 
         static std::string getKeyName(SDL_Keycode key);
         static std::string getGamepadButtonName(SDL_GamepadButton button);

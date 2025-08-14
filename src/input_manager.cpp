@@ -18,7 +18,7 @@ namespace psyengine
         actions_[actionName].bindings.emplace_back(KeyBinding{key});
     }
 
-    void InputManager::bindActionMouseButton(const std::string& actionName, const MouseButton button)
+    void InputManager::bindActionMouseButton(const std::string& actionName, const Uint8 button)
     {
         actions_[actionName].bindings.emplace_back(MouseBinding{button});
     }
@@ -152,10 +152,10 @@ namespace psyengine
             break;
 
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
-            onButtonPress(static_cast<MouseButton>(e.button.button), time::Now());
+            onButtonPress(e.button.button, time::Now());
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
-            onButtonRelease(static_cast<MouseButton>(e.button.button));
+            onButtonRelease(e.button.button);
             break;
 
         case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
@@ -237,23 +237,23 @@ namespace psyengine
         return getButtonState(button, joystickId) == ButtonState::Released;
     }
 
-    bool InputManager::isClicked(const MouseButton mouseButton) const
+    bool InputManager::isClicked(const Uint8 mouseButton) const
     {
         return getButtonState(mouseButton) == ButtonState::Clicked;
     }
 
-    bool InputManager::isHeld(const MouseButton mouseButton) const
+    bool InputManager::isHeld(const Uint8 mouseButton) const
     {
         return getButtonState(mouseButton) == ButtonState::Held;
     }
 
-    bool InputManager::isDown(const MouseButton mouseButton) const
+    bool InputManager::isDown(const Uint8 mouseButton) const
     {
         const auto st = getButtonState(mouseButton);
         return st == ButtonState::Down || st == ButtonState::Held;
     }
 
-    bool InputManager::isReleased(const MouseButton mouseButton) const
+    bool InputManager::isReleased(const Uint8 mouseButton) const
     {
         return getButtonState(mouseButton) == ButtonState::Released;
     }
@@ -291,7 +291,7 @@ namespace psyengine
         return holdThreshold_;
     }
 
-    void InputManager::onButtonPress(const SDL_Keycode key, const time::TimePoint now)
+    void InputManager::onButtonPress(const SDL_Keycode key, const time::TimePoint now) // NOLINT(*-easily-swappable-parameters)
     {
         auto& btn = keyboardButtons_[key];
         btn.isDown = true;
@@ -304,7 +304,7 @@ namespace psyengine
         btn.isDown = false;
     }
 
-    void InputManager::onButtonPress(const SDL_GamepadButton gamepadButton, const time::TimePoint now,
+    void InputManager::onButtonPress(const SDL_GamepadButton gamepadButton, const time::TimePoint now, // NOLINT(*-easily-swappable-parameters)
                                      const SDL_JoystickID joystickId)
     {
         auto& btn = gamepadButtons_[joystickId][gamepadButton];
@@ -319,14 +319,14 @@ namespace psyengine
         btn.isDown = false;
     }
 
-    void InputManager::onButtonPress(const MouseButton mouseButton, const time::TimePoint now)
+    void InputManager::onButtonPress(const Uint8 mouseButton, const time::TimePoint now) // NOLINT(*-easily-swappable-parameters)
     {
         auto& btn = mouseButtons_[mouseButton];
         btn.isDown = true;
         btn.pressTime = now;
     }
 
-    void InputManager::onButtonRelease(const MouseButton mouseButton)
+    void InputManager::onButtonRelease(const Uint8 mouseButton)
     {
         auto& btn = mouseButtons_[mouseButton];
         btn.isDown = false;
@@ -354,7 +354,7 @@ namespace psyengine
         return ButtonState::Up;
     }
 
-    InputManager::ButtonState InputManager::getButtonState(const MouseButton mouseButton) const
+    InputManager::ButtonState InputManager::getButtonState(const Uint8 mouseButton) const
     {
         if (const auto it = mouseButtons_.find(mouseButton); it != mouseButtons_.end())
         {
@@ -390,7 +390,8 @@ namespace psyengine
 
                 if (gamepadButton.isDown)
                 {
-                    if (const auto heldTime = time::TicksToSeconds<float>(now - gamepadButton.pressTime); heldTime >= holdThreshold_)
+                    if (const auto heldTime = time::TicksToSeconds<float>(now - gamepadButton.pressTime); heldTime >=
+                        holdThreshold_)
                     {
                         gamepadButton.state = ButtonState::Held;
                     }
@@ -403,7 +404,8 @@ namespace psyengine
                 {
                     if (gamepadButton.wasDown)
                     {
-                        if (const auto heldTime = time::TicksToSeconds<float>(now - gamepadButton.pressTime); heldTime < holdThreshold_)
+                        if (const auto heldTime = time::TicksToSeconds<float>(now - gamepadButton.pressTime); heldTime <
+                            holdThreshold_)
                         {
                             gamepadButton.state = ButtonState::Clicked;
                         }
@@ -427,7 +429,8 @@ namespace psyengine
 
             if (mouseButton.isDown)
             {
-                if (const auto heldTime = time::TicksToSeconds<float>(now - mouseButton.pressTime); heldTime >= holdThreshold_)
+                if (const auto heldTime = time::TicksToSeconds<float>(now - mouseButton.pressTime); heldTime >=
+                    holdThreshold_)
                 {
                     mouseButton.state = ButtonState::Held;
                 }
@@ -440,7 +443,8 @@ namespace psyengine
             {
                 if (mouseButton.wasDown)
                 {
-                    if (const auto heldTime = time::TicksToSeconds<float>(now - mouseButton.pressTime); heldTime < holdThreshold_)
+                    if (const auto heldTime = time::TicksToSeconds<float>(now - mouseButton.pressTime); heldTime <
+                        holdThreshold_)
                     {
                         mouseButton.state = ButtonState::Clicked;
                     }
@@ -463,7 +467,8 @@ namespace psyengine
 
             if (keyboardButton.isDown)
             {
-                if (const auto heldTime = time::TicksToSeconds<float>(now - keyboardButton.pressTime); heldTime >= holdThreshold_)
+                if (const auto heldTime = time::TicksToSeconds<float>(now - keyboardButton.pressTime); heldTime >=
+                    holdThreshold_)
                 {
                     keyboardButton.state = ButtonState::Held;
                 }
@@ -476,7 +481,8 @@ namespace psyengine
             {
                 if (keyboardButton.wasDown)
                 {
-                    if (const auto heldTime = time::TicksToSeconds<float>(now - keyboardButton.pressTime); heldTime < holdThreshold_)
+                    if (const auto heldTime = time::TicksToSeconds<float>(now - keyboardButton.pressTime); heldTime <
+                        holdThreshold_)
                     {
                         keyboardButton.state = ButtonState::Clicked;
                     }
