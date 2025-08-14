@@ -4,8 +4,6 @@
 
 #include "psyengine/sdl_runtime.hpp"
 
-#include <cassert>
-
 #include "SDL3_mixer/SDL_mixer.h"
 #include "SDL3_ttf/SDL_ttf.h"
 
@@ -87,22 +85,23 @@ namespace psyengine
 
     void SdlRuntime::run(const std::chrono::duration<double> fixedTimeStep, const size_t maxFixedUpdatesPerTick, const std::chrono::duration<double> maxFrameTime)
     {
-        assert(maxFixedUpdatesPerTick > 0 && "Max updates per tick must be greater than 0");
+        SDL_assert(maxFixedUpdatesPerTick > 0); // NOLINT(*-else-after-return)
 
         const size_t maxUpdates = std::max<size_t>(1, maxFixedUpdatesPerTick);
         const double tickPeriod = fixedTimeStep.count();
+        const double maxFrameTimeSeconds = maxFrameTime.count();
 
         double accumulatedTime = 0.0;
         size_t accumulatedUpdates = 0;
 
         time::TimePoint lastTime = time::Now();
-        time::TimePoint lastLagWarnTime = time::TimePoint::min();
+        time::TimePoint lastLagWarnTime = time::Min();
 
         running_ = true;
         while (running_)
         {
             const time::TimePoint now = time::Now();
-            const double frameDelta = std::min(time::Elapsed(lastTime, now), maxFrameTime.count());
+            const double frameDelta = std::min(time::Elapsed(lastTime, now), maxFrameTimeSeconds);
 
             lastTime = now;
             accumulatedTime += frameDelta;

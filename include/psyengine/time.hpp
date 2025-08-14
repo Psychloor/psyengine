@@ -5,52 +5,30 @@
 #ifndef PSYENGINE_TIME_HPP
 #define PSYENGINE_TIME_HPP
 
-#include <chrono>
-
 namespace psyengine::time
 {
-    using Clock = std::chrono::high_resolution_clock;
-    using TimePoint = std::chrono::high_resolution_clock::time_point;
+    static const double PERFORMANCE_TIMER_FREQUENCY = static_cast<double>(SDL_GetPerformanceFrequency());
+    using TimePoint = Uint64;
 
+
+    [[nodiscard]] constexpr TimePoint Min()
+    {
+        return 0;
+    }
 
     /**
-     * Retrieves the current time point using the high-resolution clock.
+     * Retrieves the current performance counter-value.
+     * The performance counter is typically used for precise timing and measuring elapsed time.
      *
-     * @return The current time point as a `TimePoint` object.
+     * @return The current performance counter-value as a TimePoint.
      */
     [[nodiscard]] inline TimePoint Now() noexcept
     {
-        return Clock::now();
+        return SDL_GetPerformanceCounter();
     }
 
     /**
-     * Calculates the elapsed duration between two time points and casts it to the specified duration type.
-     *
-     * @param from The starting time point.
-     * @param to The ending time point.
-     * @return The elapsed duration between the two time points as a duration of the specified type `Dur`.
-     */
-    template <typename Dur = std::chrono::duration<double>>
-    [[nodiscard]] Dur ElapsedDur(const TimePoint& from, const TimePoint& to) noexcept
-    {
-        return std::chrono::duration_cast<Dur>(to - from);
-    }
-
-
-    /**
-     * Computes the elapsed time in seconds since a specified time point.
-     *
-     * @param since The time point from which the elapsed time is measured.
-     * @return The elapsed time in seconds as a double.
-     */
-    [[nodiscard]] inline double ElapsedSince(const TimePoint& since) noexcept
-    {
-        return ElapsedDur<>(since, Now()).count();
-    }
-
-
-    /**
-     * Calculates the elapsed time in seconds between two specified time points.
+     * Calculates the elapsed time, in seconds, between two time points.
      *
      * @param start The starting time point.
      * @param end The ending time point.
@@ -58,18 +36,31 @@ namespace psyengine::time
      */
     [[nodiscard]] inline double Elapsed(const TimePoint& start, const TimePoint& end) noexcept
     {
-        return ElapsedDur<>(start, end).count();
+        return static_cast<double>(end - start) / PERFORMANCE_TIMER_FREQUENCY;
     }
 
+    /**
+     * Calculates the elapsed time in seconds since a given time point.
+     *
+     * @param since The reference time point from which the elapsed time is calculated.
+     * @return The elapsed time in seconds as a double.
+     */
+    [[nodiscard]] inline double ElapsedSince(const TimePoint& since) noexcept
+    {
+        return Elapsed(Now(), since);
+    }
 
     /**
-     * Calculates the elapsed time in seconds between two time points,
-     * ensuring the value does not exceed a specified maximum.
+     * Computes the elapsed time between two time points and clamps the result to a maximum value.
+     *
+     * This function calculates the elapsed time using the provided start and end time points.
+     * If the elapsed time exceeds the specified maximum duration, the result will be clamped
+     * to the value of maxSeconds. The elapsed time is measured in seconds.
      *
      * @param start The starting time point.
      * @param end The ending time point.
-     * @param maxSeconds The maximum allowable elapsed time in seconds. Defaults to 1.0.
-     * @return The clamped elapsed time in seconds as a double.
+     * @param maxSeconds The maximum allowable duration in seconds. Defaults to 1.0.
+     * @return The elapsed time in seconds, clamped to maxSeconds if it exceeds the specified limit.
      */
     [[nodiscard]] inline double ElapsedClamped(const TimePoint& start, const TimePoint& end,
                                                const double maxSeconds = 1.0) noexcept
