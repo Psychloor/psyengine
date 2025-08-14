@@ -1,9 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.31)
 project(psyengine VERSION 0.1.0 LANGUAGES CXX)
 
-# Force modern MSVC runtime policy in all subdirs that use old cmake_minimum_required
-cmake_policy(SET CMP0091 NEW)
-
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
@@ -31,6 +28,7 @@ file(GLOB_RECURSE PSY_ENGINE_HEADER_FILES
         ${PROJECT_SOURCE_DIR}/include/psyengine/*.tpp
 )
 
+# Include SDL3 and various SDL3 addons
 find_package(SDL3 CONFIG REQUIRED)
 find_package(SDL3_image CONFIG REQUIRED)
 find_package(SDL3_mixer CONFIG REQUIRED)
@@ -52,7 +50,6 @@ target_sources(${PROJECT_NAME}
         FILES
         ${PSY_ENGINE_HEADER_FILES}
 )
-
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 set_target_properties(${PROJECT_NAME} PROPERTIES
