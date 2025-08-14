@@ -8,8 +8,14 @@
 #include <memory>
 
 #include <SDL3/SDL.h>
+
+#ifdef PSYENGINE_WITH_MIXER
 #include <SDL3_mixer/SDL_mixer.h>
+#endif
+
+#ifdef PSYENGINE_WITH_TTF
 #include <SDL3_ttf/SDL_ttf.h>
+#endif
 
 namespace psyengine::raii
 {
@@ -78,6 +84,12 @@ namespace psyengine::raii
         }
     };
 
+    using SdlWindowPtr = std::unique_ptr<SDL_Window, SdlWindowDestroyer>;
+    using SdlRendererPtr = std::unique_ptr<SDL_Renderer, SdlRendererDestroyer>;
+    using SdlTexturePtr = std::unique_ptr<SDL_Texture, SdlTextureDestroyer>;
+    using SdlSurfacePtr = std::unique_ptr<SDL_Surface, SdlSurfaceDestroyer>;
+
+#ifdef PSYENGINE_WITH_MIXER
     /**
      * A custom deleter for MIX_Mixer objects, used to manage the lifetime of audio mixer resources.
      * Ensures the proper cleanup of MIX_Mixer by invoking MIX_DestroyMixer when the mixer is no longer needed.
@@ -91,6 +103,10 @@ namespace psyengine::raii
         }
     };
 
+    using SdlMixerPtr = std::unique_ptr<MIX_Mixer, SdlMixerDestroyer>;
+#endif
+
+#ifdef PSYENGINE_WITH_TTF
     /**
      * A custom deleter used to manage the lifetime of SDL_ttf resources, such as TTF_Font.
      * Ensures that the associated SDL_ttf resource is properly released when it is no longer necessary.
@@ -105,14 +121,9 @@ namespace psyengine::raii
         }
     };
 
-    using SdlWindowPtr = std::unique_ptr<SDL_Window, SdlWindowDestroyer>;
-    using SdlRendererPtr = std::unique_ptr<SDL_Renderer, SdlRendererDestroyer>;
-    using SdlTexturePtr = std::unique_ptr<SDL_Texture, SdlTextureDestroyer>;
-    using SdlSurfacePtr = std::unique_ptr<SDL_Surface, SdlSurfaceDestroyer>;
-
-    using SdlMixerPtr = std::unique_ptr<MIX_Mixer, SdlMixerDestroyer>;
-
     using SdlTtfPtr = std::unique_ptr<TTF_Font, SdlTtfDestroyer>;
+#endif
+
 }
 
 #endif //PSYENGINE_SDL_RAII_HPP

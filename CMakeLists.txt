@@ -4,14 +4,21 @@ project(psyengine VERSION 0.1.0 LANGUAGES CXX)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+# Options
+option(PSYENGINE_EXAMPLES "Compile Examples" OFF)
+option(PSYENGINE_INSTALL "Install psyengine package" OFF)
+option(PSYENGINE_WERROR "Treat warnings as errors" ON)
+option(PSYENGINE_LTO "Enable link-time optimization (IPO)" OFF)
+option(PSYENGINE_UNITY "Enable Unity builds for faster compilation" OFF)
+option(PSYENGINE_WITH_IMAGE "Enable SDL_image support" ON)
+option(PSYENGINE_WITH_MIXER "Enable SDL_mixer support" ON)
+option(PSYENGINE_WITH_TTF "Enable SDL_ttf support" ON)
+
 if (MSVC)
     if (NOT CMAKE_GENERATOR STREQUAL "Ninja")
         add_definitions(/MP)    # parallelize each target, unless Ninja is the generator
     endif ()
 endif ()
-
-option(PSYENGINE_EXAMPLES "Compile Examples" OFF)
-option(PSYENGINE_INSTALL OFF)
 
 # Sources (implementation files)
 file(GLOB_RECURSE PSY_ENGINE_SOURCE_FILES
@@ -28,11 +35,18 @@ file(GLOB_RECURSE PSY_ENGINE_HEADER_FILES
         ${PROJECT_SOURCE_DIR}/include/psyengine/*.tpp
 )
 
-# Include SDL3 and various SDL3 addons
+# Dependencies (SDL3 and optional add-ons)
 find_package(SDL3 CONFIG REQUIRED)
-find_package(SDL3_image CONFIG REQUIRED)
-find_package(SDL3_mixer CONFIG REQUIRED)
-find_package(SDL3_ttf CONFIG REQUIRED)
+if (PSYENGINE_WITH_IMAGE)
+    find_package(SDL3_image CONFIG REQUIRED)
+endif ()
+if (PSYENGINE_WITH_MIXER)
+    find_package(SDL3_mixer CONFIG REQUIRED)
+endif ()
+if (PSYENGINE_WITH_TTF)
+    find_package(SDL3_ttf CONFIG REQUIRED)
+endif ()
+
 
 if (PSYENGINE_EXAMPLES)
     add_subdirectory(examples)
@@ -52,19 +66,14 @@ target_sources(${PROJECT_NAME}
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
-set_target_properties(${PROJECT_NAME} PROPERTIES
-        CXX_STANDARD 23
-        CXX_STANDARD_REQUIRED ON
-        CXX_EXTENSIONS OFF
-)
 
+# Warnings and UTF-8
 if (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
-    # Enforce UTF-8 encoding on MSVC.
-    target_compile_options(${PROJECT_NAME} PRIVATE /utf-8)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 $<$<BOOL:${PSYENGINE_WERROR}>:/WX> /utf-8)
 else ()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic $<$<BOOL:${PSYENGINE_WERROR}>:-Werror>)
 endif ()
+
 
 # Public include path for consumers
 target_include_directories(${PROJECT_NAME}
@@ -81,6 +90,30 @@ target_link_libraries(${PROJECT_NAME}
         SDL3_image::SDL3_image
 )
 
+# Useful target properties
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        POSITION_INDEPENDENT_CODE ON
+        UNITY_BUILD $<IF:$<BOOL:${PSYENGINE_UNITY}>,ON,OFF>
+        INTERPROCEDURAL_OPTIMIZATION $<IF:$<BOOL:${PSYENGINE_LTO}>,ON,OFF>
+)
+
+# Lightweight Windows noise reduction (safe as PRIVATE)
+if (WIN32)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+endif ()
+
+# Add Compile Definitions
+if (PSYENGINE_WITH_IMAGE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_IMAGE)
+endif ()
+if (PSYENGINE_WITH_MIXER)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_MIXER)
+endif ()
+if (PSYENGINE_WITH_TTF)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_TTF)
+endif ()
+
+
 if (PSYENGINE_INSTALL)
     # Install the library and the public header file set
     install(TARGETS ${PROJECT_NAME}
@@ -88,7 +121,7 @@ if (PSYENGINE_INSTALL)
             FILE_SET HEADERS
     )
 
-    # (Optional) export for find_package in consumers
+    # Export targets for consumers (psyengineConfig.cmake-style usage)
     install(EXPORT ${PROJECT_NAME}-targets
             NAMESPACE ${PROJECT_NAME}::
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}

@@ -4,8 +4,13 @@
 
 #include "psyengine/sdl_runtime.hpp"
 
-#include "SDL3_mixer/SDL_mixer.h"
-#include "SDL3_ttf/SDL_ttf.h"
+#ifdef PSYENGINE_WITH_MIXER
+#include <SDL3_mixer/SDL_mixer.h>
+#endif
+
+#ifdef PSYENGINE_WITH_TTF
+#include <SDL3_ttf/SDL_ttf.h>
+#endif
 
 #include "psyengine/input_manager.hpp"
 #include "psyengine/state_manager.hpp"
@@ -26,27 +31,36 @@ namespace psyengine
         renderer_.reset();
         window_.reset();
 
-        // Close audio device (if opened) and quit subsystems
-        //Mix_CloseAudio();
+
+#ifdef PSYENGINE_WITH_MIXER
         MIX_Quit();
+#endif
+
+#ifdef PSYENGINE_WITH_TTF
         TTF_Quit();
+#endif
+
         SDL_Quit();
     }
 
     bool SdlRuntime::init(const std::string& title, const int width, const int height, const bool resizeableWindow)
     {
-        if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD))
+        constexpr auto initFlags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD;
+        if (!SDL_Init(initFlags))
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init failed: %s", SDL_GetError());
             return false;
         }
 
+#ifdef PSYENGINE_WITH_TTF
         if (!TTF_Init())
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "TTF_Init failed: %s", SDL_GetError());
             return false;
         }
+#endif
 
+#ifdef PSYENGINE_WITH_MIXER
         audioDevice_ = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
         if (audioDevice_ == 0)
         {
@@ -59,7 +73,7 @@ namespace psyengine
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "MIX_Init failed: %s", SDL_GetError());
             return false;
         }
-
+#endif
 
         SDL_WindowFlags windowFlags = SDL_WINDOW_HIGH_PIXEL_DENSITY;
         if (resizeableWindow)

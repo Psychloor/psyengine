@@ -124,7 +124,10 @@ namespace psyengine
 
         raii::SdlWindowPtr window_ = nullptr;
         raii::SdlRendererPtr renderer_ = nullptr;
+
+#ifdef PSYENGINE_WITH_MIXER
         SDL_AudioDeviceID audioDevice_ = 0;
+#endif
     };
 }
 
