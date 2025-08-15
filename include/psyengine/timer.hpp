@@ -42,7 +42,7 @@ namespace psyengine::time
      * @return The elapsed time in seconds as T.
      */
     template <std::floating_point T = double>
-    [[nodiscard]] PSYENGINE_EXPORT T Elapsed(const TimePoint start, const TimePoint end) noexcept
+    [[nodiscard]] T Elapsed(const TimePoint start, const TimePoint end) noexcept
     {
         return static_cast<T>(end - start) / static_cast<T>(PerformanceFrequency());
     }
@@ -54,7 +54,7 @@ namespace psyengine::time
         * @return The elapsed time in seconds as T.
         */
     template <std::floating_point T = double>
-    [[nodiscard]] PSYENGINE_EXPORT T ElapsedSince(const TimePoint since) noexcept
+    [[nodiscard]] T ElapsedSince(const TimePoint since) noexcept
     {
         return Elapsed<T>(since, Now());
     }
@@ -68,7 +68,7 @@ namespace psyengine::time
      * @return The elapsed time in seconds, clamped to maxSeconds.
      */
     template <std::floating_point T = double>
-    [[nodiscard]] PSYENGINE_EXPORT T ElapsedClamped(const TimePoint start, const TimePoint end,
+    [[nodiscard]] T ElapsedClamped(const TimePoint start, const TimePoint end,
                                    T maxSeconds = static_cast<T>(1)) noexcept
     {
         const T dt = Elapsed<T>(start, end);
@@ -79,7 +79,7 @@ namespace psyengine::time
      * Convert raw tick count to seconds.
      */
     template <std::floating_point T = double>
-    [[nodiscard]] PSYENGINE_EXPORT T TicksToSeconds(TimePoint ticks) noexcept
+    [[nodiscard]] T TicksToSeconds(TimePoint ticks) noexcept
     {
         return static_cast<T>(ticks) / static_cast<T>(PerformanceFrequency());
     }
@@ -88,7 +88,7 @@ namespace psyengine::time
      * Convert seconds to raw tick count (rounded down).
      */
     template <std::floating_point T = double>
-    [[nodiscard]] PSYENGINE_EXPORT TimePoint SecondsToTicks(T seconds) noexcept
+    [[nodiscard]] TimePoint SecondsToTicks(T seconds) noexcept
     {
         return static_cast<TimePoint>(seconds * static_cast<T>(PerformanceFrequency()));
     }
@@ -96,7 +96,7 @@ namespace psyengine::time
     /**
      * Retrieves the maximum possible value for a TimePoint.
      */
-    [[nodiscard]] PSYENGINE_EXPORT constexpr TimePoint Max() noexcept
+    [[nodiscard]] constexpr TimePoint Max() noexcept
     {
         return std::numeric_limits<TimePoint>::max();
     }
@@ -104,7 +104,7 @@ namespace psyengine::time
     /**
      * Retrieves the minimum possible value of a TimePoint.
      */
-    [[nodiscard]] PSYENGINE_EXPORT constexpr TimePoint Min() noexcept
+    [[nodiscard]] constexpr TimePoint Min() noexcept
     {
         return std::numeric_limits<TimePoint>::min();
     }
