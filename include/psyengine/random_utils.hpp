@@ -379,6 +379,81 @@ namespace psyengine::random_utils
         return MakeCustomSeededRngHashed<Mersenne64, Seed, THasher>(seed, hasher);
     }
 
-} // namespace utils::rand
+    template <std::floating_point T = float>
+    [[nodiscard]] T RandomFloat(auto& rng, T min = T{0}, T max = T{1})
+    {
+        std::uniform_real_distribution<T> dist(min, max);
+        return dist(rng);
+    }
+
+    template <std::integral T = int>
+    [[nodiscard]] T RandomInt(auto& rng, T min, T max)
+    {
+        std::uniform_int_distribution<T> dist(min, max);
+        return dist(rng);
+    }
+
+    [[nodiscard]] bool RandomBool(auto& rng, const double probability = 0.5)
+    {
+        std::bernoulli_distribution dist(probability);
+        return dist(rng);
+    }
+
+    // Random element selection
+    template <typename Container>
+    [[nodiscard]] auto& RandomElement(auto& rng, Container& container)
+    {
+        auto dist = std::uniform_int_distribution<std::size_t>(0, container.size() - 1);
+        auto it = std::begin(container);
+        std::advance(it, dist(rng));
+        return *it;
+    }
+
+    // Shuffle wrapper
+    template <typename Container>
+    void Shuffle(auto& rng, Container& container)
+    {
+        std::shuffle(std::begin(container), std::end(container), rng);
+    }
+
+    // Thread-safe global RNG
+    class PSYENGINE_EXPORT GlobalRng
+    {
+    public:
+        static auto& get()
+        {
+            if (!initialized_)
+            {
+                rng_ = MakeMersenne64();
+                initialized_ = true;
+            }
+            return rng_;
+        }
+
+        static void seed(auto&& seed)
+        {
+            rng_ = MakeMersenne64CustomSeededHash(seed);
+            initialized_ = true;
+        }
+
+    private:
+        static thread_local std::mt19937_64 rng_;
+        static thread_local bool initialized_;
+    };
+
+    // Convenience functions using global RNG
+    template <std::floating_point T = float>
+    [[nodiscard]] T Random(T min = T{0}, T max = T{1})
+    {
+        return RandomFloat(GlobalRng::get(), min, max);
+    }
+
+    template <std::integral T = int>
+    [[nodiscard]] T RandomInt(T min, T max)
+    {
+        return RandomInt(GlobalRng::get(), min, max);
+    }
+
+} // namespace utils::random_utils
 
 #endif //PSYENGINE_RANDOM_UTILS_HPP
