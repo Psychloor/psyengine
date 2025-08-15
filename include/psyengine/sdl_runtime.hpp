@@ -5,6 +5,8 @@
 #ifndef PSYENGINE_SDL_GAME_HPP
 #define PSYENGINE_SDL_GAME_HPP
 
+#include "psyengine_export.h"
+
 #include <string>
 
 #include "psyengine/sdl_raii.hpp"
@@ -37,7 +39,7 @@ namespace psyengine
     class SdlRuntime : public std::enable_shared_from_this<SdlRuntime>
     {
     public:
-        ~SdlRuntime();
+        PSYENGINE_EXPORT ~SdlRuntime();
 
         /**
          * @brief Initializes SDL subsystems and creates the application window and renderer.
@@ -51,7 +53,7 @@ namespace psyengine
          * @param resizeableWindow If true, the window is resizable.
          * @return true on success; false if any subsystem or window/renderer creation fails.
          */
-        bool init(const std::string& title, int width, int height, bool resizeableWindow = false);
+       PSYENGINE_EXPORT bool init(const std::string& title, int width, int height, bool resizeableWindow = false);
 
         /**
          * Runs the main game loop with a fixed update rate and variable frame rate rendering.
@@ -72,38 +74,38 @@ namespace psyengine
          * @param maxFixedUpdatesPerTick The maximum allowed fixed updates to process in a single frame.
          * @param maxFrameTime The maximum frame time to cap the elapsed time between frames.
          */
-        void run(size_t fixedUpdateFrequency, size_t maxFixedUpdatesPerTick = 10,
+        PSYENGINE_EXPORT void run(size_t fixedUpdateFrequency, size_t maxFixedUpdatesPerTick = 10,
                  double maxFrameTime = 1.0);
 
         /// Sets the window title.
         /// @return true on success.
-        bool setWindowTitle(const std::string& title) const;
+        PSYENGINE_EXPORT bool setWindowTitle(const std::string& title) const;
         /// Sets the window size in pixels.
         /// @return true on success.
-        bool setWindowSize(int width, int height) const;
+        PSYENGINE_EXPORT bool setWindowSize(int width, int height) const;
 
         /// Toggles fullscreen mode.
         /// @return true on success.
-        bool setWindowFullscreen(bool fullscreen) const;
+       PSYENGINE_EXPORT bool setWindowFullscreen(bool fullscreen) const;
 
         /// Enables/disables VSync on the window surface, if supported.
         /// @return true on success.
-        bool setWindowVsync(bool vsync) const;
+        PSYENGINE_EXPORT bool setWindowVsync(bool vsync) const;
 
         /// Requests the main loop to stop at the next opportunity.
-        void quit();
+        PSYENGINE_EXPORT void quit();
 
         /// @return true while the main loop is running.
-        bool isRunning() const;
+       PSYENGINE_EXPORT bool isRunning() const;
 
         /// @return true if the runtime is dropping fixed steps due to lag.
-        bool isLagging() const;
+       PSYENGINE_EXPORT bool isLagging() const;
 
         /// @return Raw SDL window handle (owned by this runtime).
-        SDL_Window* window() const;
+        PSYENGINE_EXPORT SDL_Window* window() const;
 
         /// @return Raw SDL renderer handle (owned by this runtime).
-        SDL_Renderer* renderer() const;
+        PSYENGINE_EXPORT SDL_Renderer* renderer() const;
 
     private:
         /// Polls SDL events, forwards to input and state managers, and handles quit requests.

@@ -5,6 +5,8 @@
 #ifndef PSYENGINE_RANDOM_UTILS_HPP
 #define PSYENGINE_RANDOM_UTILS_HPP
 
+#include "psyengine_export.h"
+
 #include <algorithm>
 #include <array>
 #include <functional>
@@ -27,7 +29,7 @@ namespace psyengine::random_utils
          * @tparam U A placeholder template parameter for SFINAE defaults to `void`.
          */
         template <typename T, typename U = void>
-        struct HasStateSize : std::false_type
+        struct PSYENGINE_EXPORT HasStateSize : std::false_type
         {
         };
 
@@ -140,7 +142,7 @@ namespace psyengine::random_utils
          * @param x The 64-bit unsigned integer to be mixed.
          * @return The mixed 64-bit unsigned integer.
          */
-        inline std::uint64_t Mix64(std::uint64_t x)
+        inline PSYENGINE_EXPORT std::uint64_t Mix64(std::uint64_t x)
         {
             x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9ull;
             x = (x ^ (x >> 27)) * 0x94D049BB133111EBull;
@@ -328,7 +330,7 @@ namespace psyengine::random_utils
      * @note Proper seeding ensures that the RNG produces a random enough and non-repeating
      * sequence of numbers.
      */
-    inline auto MakeMersenne32() { return MakeSeededRng<Mersenne32>(); }
+    PSYENGINE_EXPORT inline auto MakeMersenne32() { return MakeSeededRng<Mersenne32>(); }
 
     /**
      * @brief Creates and returns a seeded Mersenne Twister random number generator with a 64-bit state size.
@@ -343,7 +345,7 @@ namespace psyengine::random_utils
      * @note Proper seeding ensures that the RNG produces a random enough and non-repeating
      * sequence of numbers.
      */
-    inline auto MakeMersenne64() { return MakeSeededRng<Mersenne64>(); }
+    PSYENGINE_EXPORT inline auto MakeMersenne64() { return MakeSeededRng<Mersenne64>(); }
 
     /**
      * @brief Creates a 32-bit Mersenne Twister random number generator with a custom seeded hash.

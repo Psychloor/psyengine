@@ -3,6 +3,7 @@ project(psyengine VERSION 0.2.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(GenerateExportHeader)
 
 # Options
 option(PSYENGINE_EXAMPLES "Compile Examples" OFF)
@@ -13,6 +14,7 @@ option(PSYENGINE_UNITY "Enable Unity builds for faster compilation" OFF)
 option(PSYENGINE_WITH_IMAGE "Enable SDL_image support" ON)
 option(PSYENGINE_WITH_MIXER "Enable SDL_mixer support" ON)
 option(PSYENGINE_WITH_TTF "Enable SDL_ttf support" ON)
+option(PSYENGINE_ADDRESS_SANITIZE "Enable Address Sanitizer for debug builds" ON)
 
 if (MSVC)
     if (NOT CMAKE_GENERATOR STREQUAL "Ninja")
@@ -52,17 +54,26 @@ if (PSYENGINE_EXAMPLES)
     add_subdirectory(examples)
 endif ()
 
-add_library(${PROJECT_NAME} STATIC)
+add_library(${PROJECT_NAME})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+generate_export_header(${PROJECT_NAME}
+        BASE_NAME psyengine
+)
 
 target_sources(${PROJECT_NAME}
         PRIVATE
         ${PSY_ENGINE_SOURCE_FILES}
+
         PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${PROJECT_SOURCE_DIR}/include
         FILES
         ${PSY_ENGINE_HEADER_FILES}
+
+        FILE_SET generated_headers
+        TYPE HEADERS
+        BASE_DIRS $<TARGET_PROPERTY:${PROJECT_NAME},BINARY_DIR>
+        FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
@@ -74,11 +85,10 @@ else ()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic $<$<BOOL:${PSYENGINE_WERROR}>:-Werror>)
 endif ()
 
-
-# Public include path for consumers
 target_include_directories(${PROJECT_NAME}
         PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
@@ -90,34 +100,42 @@ target_link_libraries(${PROJECT_NAME}
         $<$<BOOL:${PSYENGINE_WITH_IMAGE}>:SDL3_image::SDL3_image>
 )
 
-# Useful target properties
 set_target_properties(${PROJECT_NAME} PROPERTIES
         POSITION_INDEPENDENT_CODE ON
         UNITY_BUILD $<IF:$<BOOL:${PSYENGINE_UNITY}>,ON,OFF>
         INTERPROCEDURAL_OPTIMIZATION $<IF:$<BOOL:${PSYENGINE_LTO}>,ON,OFF>
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN TRUE
 )
 
-# ===== Sanitizers (Debug only) =====
-# MSVC AddressSanitizer
-if (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Debug>:/fsanitize=address /Zi /sdl>
-    )
-    target_link_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Debug>:/fsanitize=address /INCREMENTAL:NO>
-    )
-endif()
+get_target_property(_lib_type ${PROJECT_NAME} TYPE)
+if (_lib_type STREQUAL "STATIC_LIBRARY")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC psyengine_STATIC_DEFINE)
+endif ()
 
-# clang-cl, Clang, or GCC: AddressSanitizer + UBSan
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-    target_compile_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Debug>:-fsanitize=address,undefined -fno-omit-frame-pointer -g>
-    )
-    target_link_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Debug>:-fsanitize=address,undefined>
-    )
-endif()
 
+
+if (PSYENGINE_ADDRESS_SANITIZE)
+    # MSVC AddressSanitizer
+    if (MSVC)
+        target_compile_options(${PROJECT_NAME} PRIVATE
+                $<$<CONFIG:Debug>:/fsanitize=address /Zi /sdl>
+        )
+        target_link_options(${PROJECT_NAME} PRIVATE
+                $<$<CONFIG:Debug>:/fsanitize=address /INCREMENTAL:NO>
+        )
+    endif ()
+
+    # clang-cl, Clang, or GCC: AddressSanitizer + UBSan
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        target_compile_options(${PROJECT_NAME} PRIVATE
+                $<$<CONFIG:Debug>:-fsanitize=address,undefined -fno-omit-frame-pointer -g>
+        )
+        target_link_options(${PROJECT_NAME} PRIVATE
+                $<$<CONFIG:Debug>:-fsanitize=address,undefined>
+        )
+    endif ()
+endif ()
 
 # Lightweight Windows noise reduction (safe as PRIVATE)
 if (WIN32)
@@ -141,6 +159,7 @@ if (PSYENGINE_INSTALL)
     install(TARGETS ${PROJECT_NAME}
             EXPORT ${PROJECT_NAME}-targets
             FILE_SET HEADERS
+            FILE_SET geberated_headers
     )
 
     # Export targets for consumers (psyengineConfig.cmake-style usage)
