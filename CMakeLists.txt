@@ -69,7 +69,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
 # Warnings and UTF-8
 if (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4 $<$<BOOL:${PSYENGINE_WERROR}>:/WX> /utf-8)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 $<$<BOOL:${PSYENGINE_WERROR}>:/WX>)
 else ()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic $<$<BOOL:${PSYENGINE_WERROR}>:-Werror>)
 endif ()
@@ -96,6 +96,28 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
         UNITY_BUILD $<IF:$<BOOL:${PSYENGINE_UNITY}>,ON,OFF>
         INTERPROCEDURAL_OPTIMIZATION $<IF:$<BOOL:${PSYENGINE_LTO}>,ON,OFF>
 )
+
+# ===== Sanitizers (Debug only) =====
+# MSVC AddressSanitizer
+if (MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE
+            $<$<CONFIG:Debug>:/fsanitize=address /Zi /sdl>
+    )
+    target_link_options(${PROJECT_NAME} PRIVATE
+            $<$<CONFIG:Debug>:/fsanitize=address /INCREMENTAL:NO>
+    )
+endif()
+
+# clang-cl, Clang, or GCC: AddressSanitizer + UBSan
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(${PROJECT_NAME} PRIVATE
+            $<$<CONFIG:Debug>:-fsanitize=address,undefined -fno-omit-frame-pointer -g>
+    )
+    target_link_options(${PROJECT_NAME} PRIVATE
+            $<$<CONFIG:Debug>:-fsanitize=address,undefined>
+    )
+endif()
+
 
 # Lightweight Windows noise reduction (safe as PRIVATE)
 if (WIN32)

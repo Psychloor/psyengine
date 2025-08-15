@@ -5,7 +5,7 @@
 #ifndef PSYENGINE_SDL_GAME_HPP
 #define PSYENGINE_SDL_GAME_HPP
 
-#include <chrono>
+#include <string>
 
 #include "psyengine/sdl_raii.hpp"
 
@@ -68,12 +68,12 @@ namespace psyengine
          * - The frame updates and rendering are still handled with a variable time step within a maximum frame time
          *   limit (`maxFrameTime`) to ensure smooth graphical performance.
          *
-         * @param fixedTimeStep The fixed time interval for updates (e.g., 1/60 seconds for 60 updates per second).
+         * @param fixedUpdateFrequency The number of fixed updates per second.
          * @param maxFixedUpdatesPerTick The maximum allowed fixed updates to process in a single frame.
          * @param maxFrameTime The maximum frame time to cap the elapsed time between frames.
          */
-        void run(std::chrono::duration<double> fixedTimeStep, size_t maxFixedUpdatesPerTick = 10,
-                 std::chrono::duration<double> maxFrameTime = std::chrono::seconds(1));
+        void run(size_t fixedUpdateFrequency, size_t maxFixedUpdatesPerTick = 10,
+                 double maxFrameTime = 1.0);
 
         /// Sets the window title.
         /// @return true on success.
@@ -121,13 +121,9 @@ namespace psyengine
         bool running_{}; ///< Main loop flag.
         bool lagging_{}; ///< Indicates we dropped fixed steps due to lag in the last frame.
 
-
         raii::SdlWindowPtr window_ = nullptr;
         raii::SdlRendererPtr renderer_ = nullptr;
 
-#ifdef PSYENGINE_WITH_MIXER
-        SDL_AudioDeviceID audioDevice_ = 0;
-#endif
     };
 }
 

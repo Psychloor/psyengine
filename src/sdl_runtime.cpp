@@ -22,15 +22,9 @@ namespace psyengine
     {
         StateManager::instance().clear();
 
-        if (audioDevice_ != 0)
-        {
-            SDL_CloseAudioDevice(audioDevice_);
-        }
-
         // Ensure SDL objects are destroyed before SDL_Quit
         renderer_.reset();
         window_.reset();
-
 
 #ifdef PSYENGINE_WITH_MIXER
         MIX_Quit();
@@ -61,13 +55,6 @@ namespace psyengine
 #endif
 
 #ifdef PSYENGINE_WITH_MIXER
-        audioDevice_ = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
-        if (audioDevice_ == 0)
-        {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_OpenAudioDevice failed: %s", SDL_GetError());
-            return false;
-        }
-
         if (!MIX_Init())
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "MIX_Init failed: %s", SDL_GetError());
@@ -81,29 +68,28 @@ namespace psyengine
             windowFlags |= SDL_WINDOW_RESIZABLE;
         }
 
-        SDL_Window* windowTemp;
-        SDL_Renderer* rendererTemp;
-        if (!SDL_CreateWindowAndRenderer(title.c_str(), width, height, windowFlags, &windowTemp,
-                                         &rendererTemp))
+        SDL_Window* window;
+        SDL_Renderer* renderer;
+        if (!SDL_CreateWindowAndRenderer(title.c_str(), width, height, windowFlags, &window, &renderer))
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindowAndRenderer failed: %s", SDL_GetError());
             return false;
         }
 
-        window_ = raii::SdlWindowPtr(windowTemp);
-        renderer_ = raii::SdlRendererPtr(rendererTemp);
+        window_ = raii::SdlWindowPtr(window);
+        renderer_ = raii::SdlRendererPtr(renderer);
 
         return true;
     }
 
 
-    void SdlRuntime::run(const std::chrono::duration<double> fixedTimeStep, const size_t maxFixedUpdatesPerTick, const std::chrono::duration<double> maxFrameTime)
+    void SdlRuntime::run(const size_t fixedUpdateFrequency, const size_t maxFixedUpdatesPerTick, const double maxFrameTime) // NOLINT(*-easily-swappable-parameters)
     {
         SDL_assert(maxFixedUpdatesPerTick > 0); // NOLINT(*-else-after-return)
 
         const size_t maxUpdates = std::max<size_t>(1, maxFixedUpdatesPerTick);
-        const double tickPeriod = fixedTimeStep.count();
-        const double maxFrameTimeSeconds = maxFrameTime.count();
+        const double tickPeriod = 1.0 / static_cast<double>(fixedUpdateFrequency);
+        const double maxFrameTimeSeconds = maxFrameTime;
 
         double accumulatedTime = 0.0;
         size_t accumulatedUpdates = 0;
