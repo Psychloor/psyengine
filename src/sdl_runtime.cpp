@@ -14,7 +14,7 @@
 
 #include "psyengine/input_manager.hpp"
 #include "psyengine/state_manager.hpp"
-#include "psyengine/time.hpp"
+#include "psyengine/timer.hpp"
 
 namespace psyengine
 {
@@ -101,7 +101,7 @@ namespace psyengine
         while (running_)
         {
             const time::TimePoint now = time::Now();
-            const double frameDelta = std::min(time::Elapsed<double>(lastTime, now), maxFrameTimeSeconds);
+            const double frameDelta = std::min(time::Elapsed(lastTime, now), maxFrameTimeSeconds);
 
             lastTime = now;
             accumulatedTime += frameDelta;
@@ -127,7 +127,7 @@ namespace psyengine
                 lagging_ = true;
 
                 // Throttle warning to 1/sec
-                if (time::Elapsed<double>(lastLagWarnTime, now) > 1.0)
+                if (time::Elapsed(lastLagWarnTime, now) > 1.0)
                 {
                     SDL_Log("Warning: fixed update lagging, dropped extra steps");
                     lastLagWarnTime = now;

@@ -2,8 +2,8 @@
 // Created by blomq on 2025-08-12.
 //
 
-#ifndef PSYENGINE_TIME_HPP
-#define PSYENGINE_TIME_HPP
+#ifndef PSYENGINE_TIMER_HPP
+#define PSYENGINE_TIMER_HPP
 
 #include "psyengine_export.h"
 
@@ -41,7 +41,7 @@ namespace psyengine::time
      * @param end The ending time point.
      * @return The elapsed time in seconds as T.
      */
-    template <std::floating_point T>
+    template <std::floating_point T = double>
     [[nodiscard]] PSYENGINE_EXPORT T Elapsed(const TimePoint start, const TimePoint end) noexcept
     {
         return static_cast<T>(end - start) / static_cast<T>(PerformanceFrequency());
@@ -53,7 +53,7 @@ namespace psyengine::time
         * @param since The reference time point from which the elapsed time is calculated.
         * @return The elapsed time in seconds as T.
         */
-    template <std::floating_point T>
+    template <std::floating_point T = double>
     [[nodiscard]] PSYENGINE_EXPORT T ElapsedSince(const TimePoint since) noexcept
     {
         return Elapsed<T>(since, Now());
@@ -67,7 +67,7 @@ namespace psyengine::time
      * @param maxSeconds The maximum allowable duration in seconds (same type as return).
      * @return The elapsed time in seconds, clamped to maxSeconds.
      */
-    template <std::floating_point T>
+    template <std::floating_point T = double>
     [[nodiscard]] PSYENGINE_EXPORT T ElapsedClamped(const TimePoint start, const TimePoint end,
                                    T maxSeconds = static_cast<T>(1)) noexcept
     {
@@ -78,7 +78,7 @@ namespace psyengine::time
     /**
      * Convert raw tick count to seconds.
      */
-    template <std::floating_point T>
+    template <std::floating_point T = double>
     [[nodiscard]] PSYENGINE_EXPORT T TicksToSeconds(TimePoint ticks) noexcept
     {
         return static_cast<T>(ticks) / static_cast<T>(PerformanceFrequency());
@@ -87,7 +87,7 @@ namespace psyengine::time
     /**
      * Convert seconds to raw tick count (rounded down).
      */
-    template <std::floating_point T>
+    template <std::floating_point T = double>
     [[nodiscard]] PSYENGINE_EXPORT TimePoint SecondsToTicks(T seconds) noexcept
     {
         return static_cast<TimePoint>(seconds * static_cast<T>(PerformanceFrequency()));
@@ -109,6 +109,57 @@ namespace psyengine::time
         return std::numeric_limits<TimePoint>::min();
     }
 
+    class PSYENGINE_EXPORT DeltaTimer {
+    public:
+        template<std::floating_point T = float>
+        [[nodiscard]] T getDelta() noexcept {
+            const TimePoint current = Now();
+            const T delta = Elapsed<T>(lastTime_, current);
+            lastTime_ = current;
+            return delta;
+        }
+
+        template<std::floating_point T = float>
+        [[nodiscard]] T getDeltaClamped(T maxDelta = static_cast<T>(1.0/30.0)) noexcept {
+            const TimePoint current = Now();
+            const T delta = ElapsedClamped<T>(lastTime_, current, maxDelta);
+            lastTime_ = current;
+            return delta;
+        }
+
+    private:
+        TimePoint lastTime_ = Now();
+    };
+
+    class PSYENGINE_EXPORT Timer {
+    public:
+        void start() noexcept {
+            startTime_ = Now();
+            running_ = true;
+        }
+
+        void reset() noexcept {
+            startTime_ = Now();
+        }
+
+        template<std::floating_point T = float>
+        [[nodiscard]] T elapsed() const noexcept {
+            return running_ ? ElapsedSince<T>(startTime_) : T{0};
+        }
+
+        [[nodiscard]] bool isRunning() const noexcept {
+            return running_;
+        }
+
+        void stop() noexcept {
+            running_ = false;
+        }
+
+    private:
+    private:
+        TimePoint startTime_ = 0;
+        bool running_ = false;
+    };
 }
 
-#endif //PSYENGINE_TIME_HPP
+#endif //PSYENGINE_TIMER_HPP

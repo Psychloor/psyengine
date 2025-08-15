@@ -13,7 +13,7 @@
 
 #include <SDL3/SDL.h>
 
-#include "time.hpp"
+#include "timer.hpp"
 
 namespace psyengine
 {

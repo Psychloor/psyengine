@@ -1,170 +1,280 @@
 ﻿cmake_minimum_required(VERSION 3.31)
-project(psyengine VERSION 0.2.0 LANGUAGES CXX)
+project(psyengine
+        VERSION 0.2.0
+        LANGUAGES CXX
+        DESCRIPTION "A modern C++ game engine library"
+)
 
+# ============================================================================
+# Standard CMake modules
+# ============================================================================
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(GenerateExportHeader)
+include(CheckIPOSupported)
 
-# Options
-option(PSYENGINE_EXAMPLES "Compile Examples" OFF)
-option(PSYENGINE_INSTALL "Install psyengine package" OFF)
+# ============================================================================
+# Build options
+# ============================================================================
+option(PSYENGINE_EXAMPLES "Build examples" OFF)
+option(PSYENGINE_INSTALL "Install psyengine package" ON)
 option(PSYENGINE_WERROR "Treat warnings as errors" ON)
-option(PSYENGINE_LTO "Enable link-time optimization (IPO)" OFF)
+option(PSYENGINE_LTO "Enable link-time optimization" OFF)
 option(PSYENGINE_UNITY "Enable Unity builds for faster compilation" OFF)
 option(PSYENGINE_WITH_IMAGE "Enable SDL_image support" ON)
 option(PSYENGINE_WITH_MIXER "Enable SDL_mixer support" ON)
 option(PSYENGINE_WITH_TTF "Enable SDL_ttf support" ON)
 option(PSYENGINE_ADDRESS_SANITIZE "Enable Address Sanitizer for debug builds" ON)
+option(PSYENGINE_BUILD_SHARED "Build as shared library" ON)
 
-if (MSVC)
-    if (NOT CMAKE_GENERATOR STREQUAL "Ninja")
-        add_definitions(/MP)    # parallelize each target, unless Ninja is the generator
-    endif ()
-endif ()
+# ============================================================================
+# Compiler-specific optimizations
+# ============================================================================
+if(MSVC AND NOT CMAKE_GENERATOR STREQUAL "Ninja")
+    # Enable parallel compilation for MSVC (except when using Ninja)
+    add_compile_options(/MP)
+endif()
 
-# Sources (implementation files)
-file(GLOB_RECURSE PSY_ENGINE_SOURCE_FILES
-        LIST_DIRECTORIES false
-        CONFIGURE_DEPENDS
-        ${PROJECT_SOURCE_DIR}/src/*.cpp
-)
-
-# Headers (public API + templates)
-file(GLOB_RECURSE PSY_ENGINE_HEADER_FILES
-        LIST_DIRECTORIES false
-        CONFIGURE_DEPENDS
-        ${PROJECT_SOURCE_DIR}/include/psyengine/*.hpp
-        ${PROJECT_SOURCE_DIR}/include/psyengine/*.tpp
-)
-
-# Dependencies (SDL3 and optional add-ons)
+# ============================================================================
+# Dependencies
+# ============================================================================
 find_package(SDL3 CONFIG REQUIRED)
-if (PSYENGINE_WITH_IMAGE)
+
+# Optional SDL3 extensions
+set(PSYENGINE_SDL_LIBRARIES SDL3::SDL3)
+
+if(PSYENGINE_WITH_IMAGE)
     find_package(SDL3_image CONFIG REQUIRED)
-endif ()
-if (PSYENGINE_WITH_MIXER)
+    list(APPEND PSYENGINE_SDL_LIBRARIES SDL3_image::SDL3_image)
+endif()
+
+if(PSYENGINE_WITH_MIXER)
     find_package(SDL3_mixer CONFIG REQUIRED)
-endif ()
-if (PSYENGINE_WITH_TTF)
+    list(APPEND PSYENGINE_SDL_LIBRARIES SDL3_mixer::SDL3_mixer)
+endif()
+
+if(PSYENGINE_WITH_TTF)
     find_package(SDL3_ttf CONFIG REQUIRED)
-endif ()
+    list(APPEND PSYENGINE_SDL_LIBRARIES SDL3_ttf::SDL3_ttf)
+endif()
 
-
-if (PSYENGINE_EXAMPLES)
-    add_subdirectory(examples)
-endif ()
-
-add_library(${PROJECT_NAME})
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
-generate_export_header(${PROJECT_NAME}
-        BASE_NAME psyengine
+# ============================================================================
+# Source files
+# ============================================================================
+file(GLOB_RECURSE PSYENGINE_SOURCES
+        LIST_DIRECTORIES false
+        CONFIGURE_DEPENDS
+        src/*.cpp
 )
 
+file(GLOB_RECURSE PSYENGINE_HEADERS
+        LIST_DIRECTORIES false
+        CONFIGURE_DEPENDS
+        include/psyengine/*.hpp
+        include/psyengine/*.tpp
+)
+
+# ============================================================================
+# Create library target
+# ============================================================================
+if(PSYENGINE_BUILD_SHARED)
+    add_library(${PROJECT_NAME} SHARED)
+else()
+    add_library(${PROJECT_NAME} STATIC)
+endif()
+
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
+# Generate export header
+generate_export_header(${PROJECT_NAME}
+        BASE_NAME ${PROJECT_NAME}
+        EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h
+)
+
+# ============================================================================
+# Target configuration
+# ============================================================================
 target_sources(${PROJECT_NAME}
-        PRIVATE
-        ${PSY_ENGINE_SOURCE_FILES}
-
-        PUBLIC
-        FILE_SET HEADERS
-        BASE_DIRS ${PROJECT_SOURCE_DIR}/include
-        FILES
-        ${PSY_ENGINE_HEADER_FILES}
-
-        FILE_SET generated_headers
+        PRIVATE ${PSYENGINE_SOURCES}
+        PUBLIC FILE_SET HEADERS
+        BASE_DIRS include
+        FILES ${PSYENGINE_HEADERS}
+        PUBLIC FILE_SET generated_headers
         TYPE HEADERS
-        BASE_DIRS $<TARGET_PROPERTY:${PROJECT_NAME},BINARY_DIR>
+        BASE_DIRS ${CMAKE_CURRENT_BINARY_DIR}
         FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
-# Warnings and UTF-8
-if (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4 $<$<BOOL:${PSYENGINE_WERROR}>:/WX>)
-else ()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic $<$<BOOL:${PSYENGINE_WERROR}>:-Werror>)
-endif ()
-
 target_include_directories(${PROJECT_NAME}
         PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_link_libraries(${PROJECT_NAME}
-        PUBLIC
-        SDL3::SDL3
-        $<$<BOOL:${PSYENGINE_WITH_TTF}>:SDL3_ttf::SDL3_ttf>
-        $<$<BOOL:${PSYENGINE_WITH_MIXER}>:SDL3_mixer::SDL3_mixer>
-        $<$<BOOL:${PSYENGINE_WITH_IMAGE}>:SDL3_image::SDL3_image>
-)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${PSYENGINE_SDL_LIBRARIES})
 
+# ============================================================================
+# Compiler warnings and flags
+# ============================================================================
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE
+            /W4
+            /utf-8  # Force UTF-8 encoding
+            $<$<BOOL:${PSYENGINE_WERROR}>:/WX>
+    )
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+            WIN32_LEAN_AND_MEAN
+            NOMINMAX
+            _CRT_SECURE_NO_WARNINGS
+    )
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE
+            -Wall -Wextra -Wpedantic
+            $<$<BOOL:${PSYENGINE_WERROR}>:-Werror>
+    )
+endif()
+
+# ============================================================================
+# Feature-based compile definitions
+# ============================================================================
+if(PSYENGINE_WITH_IMAGE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_IMAGE)
+endif()
+
+if(PSYENGINE_WITH_MIXER)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_MIXER)
+endif()
+
+if(PSYENGINE_WITH_TTF)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_TTF)
+endif()
+
+# Static library definition
+get_target_property(LIB_TYPE ${PROJECT_NAME} TYPE)
+if(LIB_TYPE STREQUAL "STATIC_LIBRARY")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}_STATIC_DEFINE)
+endif()
+
+# ============================================================================
+# Target properties
+# ============================================================================
 set_target_properties(${PROJECT_NAME} PROPERTIES
+        VERSION ${PROJECT_VERSION}
+        SOVERSION ${PROJECT_VERSION_MAJOR}
         POSITION_INDEPENDENT_CODE ON
-        UNITY_BUILD $<IF:$<BOOL:${PSYENGINE_UNITY}>,ON,OFF>
-        INTERPROCEDURAL_OPTIMIZATION $<IF:$<BOOL:${PSYENGINE_LTO}>,ON,OFF>
         CXX_VISIBILITY_PRESET hidden
-        VISIBILITY_INLINES_HIDDEN TRUE
+        VISIBILITY_INLINES_HIDDEN ON
+        UNITY_BUILD ${PSYENGINE_UNITY}
 )
 
-get_target_property(_lib_type ${PROJECT_NAME} TYPE)
-if (_lib_type STREQUAL "STATIC_LIBRARY")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC psyengine_STATIC_DEFINE)
-endif ()
+# Link-time optimization
+if(PSYENGINE_LTO)
+    check_ipo_supported(RESULT ipo_supported OUTPUT ipo_error)
+    if(ipo_supported)
+        set_target_properties(${PROJECT_NAME} PROPERTIES
+                INTERPROCEDURAL_OPTIMIZATION ON
+        )
+    else()
+        message(WARNING "LTO requested but not supported: ${ipo_error}")
+    endif()
+endif()
 
-
-
-if (PSYENGINE_ADDRESS_SANITIZE)
-    # MSVC AddressSanitizer
-    if (MSVC)
+# ============================================================================
+# Address Sanitizer (Debug builds only)
+# ============================================================================
+if(PSYENGINE_ADDRESS_SANITIZE)
+    if(MSVC)
         target_compile_options(${PROJECT_NAME} PRIVATE
-                $<$<CONFIG:Debug>:/fsanitize=address /Zi /sdl>
+                $<$<CONFIG:Debug>:/fsanitize=address /Zi>
         )
         target_link_options(${PROJECT_NAME} PRIVATE
                 $<$<CONFIG:Debug>:/fsanitize=address /INCREMENTAL:NO>
         )
-    endif ()
-
-    # clang-cl, Clang, or GCC: AddressSanitizer + UBSan
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_compile_options(${PROJECT_NAME} PRIVATE
                 $<$<CONFIG:Debug>:-fsanitize=address,undefined -fno-omit-frame-pointer -g>
         )
         target_link_options(${PROJECT_NAME} PRIVATE
                 $<$<CONFIG:Debug>:-fsanitize=address,undefined>
         )
-    endif ()
-endif ()
+    endif()
+endif()
 
-# Lightweight Windows noise reduction (safe as PRIVATE)
-if (WIN32)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
-endif ()
+# ============================================================================
+# Examples subdirectory
+# ============================================================================
+if(PSYENGINE_EXAMPLES)
+    add_subdirectory(examples)
+endif()
 
-# Add Compile Definitions
-if (PSYENGINE_WITH_IMAGE)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_IMAGE)
-endif ()
-if (PSYENGINE_WITH_MIXER)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_MIXER)
-endif ()
-if (PSYENGINE_WITH_TTF)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_TTF)
-endif ()
-
-
-if (PSYENGINE_INSTALL)
-    # Install the library and the public header file set
+# ============================================================================
+# Installation
+# ============================================================================
+if(PSYENGINE_INSTALL)
+    # Install targets
     install(TARGETS ${PROJECT_NAME}
             EXPORT ${PROJECT_NAME}-targets
-            FILE_SET HEADERS
-            FILE_SET geberated_headers
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            FILE_SET generated_headers DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     )
 
-    # Export targets for consumers (psyengineConfig.cmake-style usage)
+    # Export targets for find_package()
     install(EXPORT ${PROJECT_NAME}-targets
+            FILE ${PROJECT_NAME}Targets.cmake
             NAMESPACE ${PROJECT_NAME}::
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
     )
-endif ()
+
+    # Create config file
+    configure_package_config_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
+            ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+            INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    )
+
+    # Create version file
+    write_basic_package_version_file(
+            ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+            VERSION ${PROJECT_VERSION}
+            COMPATIBILITY SameMajorVersion
+    )
+
+    # Install config files
+    install(FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    )
+
+    # Install README, LICENSE, etc. if they exist
+    foreach(doc_file README.md LICENSE LICENSE.txt CHANGELOG.md)
+        if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${doc_file})
+            install(FILES ${doc_file} DESTINATION ${CMAKE_INSTALL_DOCDIR})
+        endif()
+    endforeach()
+endif()
+
+# ============================================================================
+# Summary
+# ============================================================================
+message(STATUS "")
+message(STATUS "psyengine v${PROJECT_VERSION} Configuration Summary:")
+message(STATUS "  Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "  Library type: ${LIB_TYPE}")
+message(STATUS "  Install: ${PSYENGINE_INSTALL}")
+message(STATUS "  Examples: ${PSYENGINE_EXAMPLES}")
+message(STATUS "  Warnings as errors: ${PSYENGINE_WERROR}")
+message(STATUS "  Unity builds: ${PSYENGINE_UNITY}")
+message(STATUS "  LTO: ${PSYENGINE_LTO}")
+message(STATUS "  Address Sanitizer: ${PSYENGINE_ADDRESS_SANITIZE}")
+message(STATUS "  SDL extensions:")
+message(STATUS "    Image: ${PSYENGINE_WITH_IMAGE}")
+message(STATUS "    Mixer: ${PSYENGINE_WITH_MIXER}")
+message(STATUS "    TTF: ${PSYENGINE_WITH_TTF}")
+message(STATUS "")
