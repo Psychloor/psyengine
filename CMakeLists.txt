@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.31)
-project(psyengine VERSION 0.1.0 LANGUAGES CXX)
+project(psyengine VERSION 0.2.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -85,9 +85,9 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
         PUBLIC
         SDL3::SDL3
-        SDL3_ttf::SDL3_ttf
-        SDL3_mixer::SDL3_mixer
-        SDL3_image::SDL3_image
+        $<$<BOOL:${PSYENGINE_WITH_TTF}>:SDL3_ttf::SDL3_ttf>
+        $<$<BOOL:${PSYENGINE_WITH_MIXER}>:SDL3_mixer::SDL3_mixer>
+        $<$<BOOL:${PSYENGINE_WITH_IMAGE}>:SDL3_image::SDL3_image>
 )
 
 # Useful target properties
