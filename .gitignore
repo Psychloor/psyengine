@@ -499,3 +499,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+# Let psyengine files through
+!/include/psyengine/debug
