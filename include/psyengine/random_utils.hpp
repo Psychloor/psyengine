@@ -30,8 +30,7 @@ namespace psyengine::random_utils
          */
         template <typename T, typename U = void>
         struct PSYENGINE_EXPORT HasStateSize : std::false_type
-        {
-        };
+        {};
 
         /**
          * @brief Trait to detect whether a type provides a `state_size` member.
@@ -44,8 +43,7 @@ namespace psyengine::random_utils
          */
         template <typename T>
         struct HasStateSize<T, std::void_t<decltype(T::state_size)>> : std::true_type
-        {
-        };
+        {};
 
         /**
          * @brief Determines if a given type has a `state_size` member at compile-time.
@@ -144,8 +142,8 @@ namespace psyengine::random_utils
          */
         inline PSYENGINE_EXPORT std::uint64_t Mix64(std::uint64_t x)
         {
-            x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9ull;
-            x = (x ^ (x >> 27)) * 0x94D049BB133111EBull;
+            x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9ULL;
+            x = (x ^ (x >> 27)) * 0x94D049BB133111EBULL;
             x ^= (x >> 31);
             return x;
         }
@@ -256,7 +254,7 @@ namespace psyengine::random_utils
         for (std::size_t i = 0; i < n; ++i)
         {
             // advance state (golden ratio increment)
-            state += 0x9E3779B97F4A7C15ull;
+            state += 0x9E3779B97F4A7C15ULL;
             const std::uint64_t z = psyengine::random_utils::detail::Mix64(state);
             seedData.push_back(static_cast<std::uint32_t>(z)); // take 32-bit chunks
         }
@@ -294,19 +292,23 @@ namespace psyengine::random_utils
             std::invocable<THasher, const std::ranges::range_value_t<Range>&>)
     [[nodiscard]] Engine MakeCustomSeededRngHashedRange(const Range& items, THasher elemHasher)
     {
-        std::uint64_t combined = 0xcbf29ce484222325ull; // FNV-1a offset basis as a simple start
+        std::uint64_t combined = 0xcbf29ce484222325ULL; // FNV-1a offset basis as a simple start
         for (const auto& v : items)
         {
             const auto h = static_cast<std::uint64_t>(elemHasher(v));
             // simple 64-bit combine
-            combined ^= h + 0x9E3779B97F4A7C15ull + (combined << 6) + (combined >> 2);
+            combined ^= h + 0x9E3779B97F4A7C15ULL + (combined << 6) + (combined >> 2);
         }
 
         // Reuse the single-seed version with a lambda hasher
         struct PassThroughHash
         {
             std::uint64_t h;
-            std::uint64_t operator()(std::uint64_t) const noexcept { return h; }
+
+            std::uint64_t operator()(std::uint64_t) const noexcept
+            {
+                return h;
+            }
         };
 
         return MakeCustomSeededRngHashed<Engine, std::uint64_t>(combined, PassThroughHash{combined});
@@ -330,7 +332,10 @@ namespace psyengine::random_utils
      * @note Proper seeding ensures that the RNG produces a random enough and non-repeating
      * sequence of numbers.
      */
-    PSYENGINE_EXPORT inline auto MakeMersenne32() { return MakeSeededRng<Mersenne32>(); }
+    PSYENGINE_EXPORT inline auto MakeMersenne32()
+    {
+        return MakeSeededRng<Mersenne32>();
+    }
 
     /**
      * @brief Creates and returns a seeded Mersenne Twister random number generator with a 64-bit state size.
@@ -345,7 +350,10 @@ namespace psyengine::random_utils
      * @note Proper seeding ensures that the RNG produces a random enough and non-repeating
      * sequence of numbers.
      */
-    PSYENGINE_EXPORT inline auto MakeMersenne64() { return MakeSeededRng<Mersenne64>(); }
+    PSYENGINE_EXPORT inline auto MakeMersenne64()
+    {
+        return MakeSeededRng<Mersenne64>();
+    }
 
     /**
      * @brief Creates a 32-bit Mersenne Twister random number generator with a custom seeded hash.
@@ -395,7 +403,7 @@ namespace psyengine::random_utils
 
     [[nodiscard]] bool RandomBool(auto& rng, const double probability = 0.5)
     {
-        std::bernoulli_distribution dist(probability);
+        std::bernoulli_distribution const dist(probability);
         return dist(rng);
     }
 

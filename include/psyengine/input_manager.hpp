@@ -102,7 +102,7 @@ namespace psyengine
         struct PSYENGINE_EXPORT AxisData
         {
             Sint16 value = 0; // raw SDL value (-32 768 to 32 767)
-            float scale = 1.0f; // user-configurable scaling if desired
+            float scale = 1.0F; // user-configurable scaling if desired
         };
 
         // --- BINDING TYPES FOR ACTIONS ---
@@ -167,7 +167,7 @@ namespace psyengine
          * @param joystickId The ID of the joystick to which the binding applies. 0 means any
          */
         PSYENGINE_EXPORT void bindActionGamepadButton(const std::string& actionName, SDL_GamepadButton button,
-                                     SDL_JoystickID joystickId = 0);
+                                                      SDL_JoystickID joystickId = 0);
 
         // --- Queries for actions (aggregated over all bindings) ---
 
@@ -390,7 +390,8 @@ namespace psyengine
          * @return The raw value of the specified axis as a signed 16-bit integer (Sint16).
          *         Returns 0 if the axis or joystick does not exist in the mapping.
          */
-        [[nodiscard]] PSYENGINE_EXPORT Sint16 getAxisRaw(SDL_GamepadAxis gamepadAxis, SDL_JoystickID joystickId = 0) const;
+        [[nodiscard]] PSYENGINE_EXPORT Sint16 getAxisRaw(SDL_GamepadAxis gamepadAxis,
+                                                         SDL_JoystickID joystickId = 0) const;
 
         /**
          * @brief Retrieves the normalized value of a specific gamepad axis for a given joystick.
@@ -404,7 +405,7 @@ namespace psyengine
          * @return The normalized axis value in the range of -1.0 to 1.0, or 0.0 if the raw axis value is zero.
          */
         [[nodiscard]] PSYENGINE_EXPORT float getAxisNormalized(SDL_GamepadAxis gamepadAxis,
-                                              SDL_JoystickID joystickId = 0) const;
+                                                               SDL_JoystickID joystickId = 0) const;
 
         /**
          * @brief Sets the duration threshold for considering an input as a "hold".
@@ -434,11 +435,7 @@ namespace psyengine
         InputManager& operator=(InputManager&& other) noexcept = delete;
 
     private:
-        PSYENGINE_EXPORT InputManager() :
-            holdThreshold_(0.3f)
-        {
-        }
-
+        PSYENGINE_EXPORT InputManager() = default;
         PSYENGINE_EXPORT ~InputManager() = default;
 
         std::unordered_map<Uint8, ButtonData> mouseButtons_;
@@ -449,7 +446,7 @@ namespace psyengine
 
         std::unordered_map<std::string, Action> actions_;
 
-        float holdThreshold_;
+        float holdThreshold_{0.3F};
 
         // Helper to check each binding of an action with a callable that returns bool
         template <typename Func>

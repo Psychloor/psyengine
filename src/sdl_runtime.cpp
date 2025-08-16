@@ -12,6 +12,8 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #endif
 
+#include <cassert>
+
 #include "psyengine/input_manager.hpp"
 #include "psyengine/state_manager.hpp"
 #include "psyengine/timer.hpp"
@@ -42,6 +44,7 @@ namespace psyengine
         constexpr auto initFlags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD;
         if (!SDL_Init(initFlags))
         {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg) — SDL logging uses C-style varargs by design
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init failed: %s", SDL_GetError());
             return false;
         }
@@ -49,6 +52,7 @@ namespace psyengine
 #ifdef PSYENGINE_WITH_TTF
         if (!TTF_Init())
         {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg) — SDL logging uses C-style varargs by design
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "TTF_Init failed: %s", SDL_GetError());
             return false;
         }
@@ -57,6 +61,7 @@ namespace psyengine
 #ifdef PSYENGINE_WITH_MIXER
         if (!MIX_Init())
         {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg) — SDL logging uses C-style varargs by design
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "MIX_Init failed: %s", SDL_GetError());
             return false;
         }
@@ -68,10 +73,11 @@ namespace psyengine
             windowFlags |= SDL_WINDOW_RESIZABLE;
         }
 
-        SDL_Window* window;
-        SDL_Renderer* renderer;
+        SDL_Window* window = nullptr;
+        SDL_Renderer* renderer = nullptr;
         if (!SDL_CreateWindowAndRenderer(title.c_str(), width, height, windowFlags, &window, &renderer))
         {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg) — SDL logging uses C-style varargs by design
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindowAndRenderer failed: %s", SDL_GetError());
             return false;
         }
@@ -83,13 +89,14 @@ namespace psyengine
     }
 
 
-    void SdlRuntime::run(const size_t fixedUpdateFrequency, const size_t maxFixedUpdatesPerTick, const double maxFrameTime) // NOLINT(*-easily-swappable-parameters)
+    void SdlRuntime::run(const FixedUpdateFrequency fixedUpdateFrequency,
+                         const MaxFixedUpdatesPerTick maxFixedUpdatesPerTick, const double maxFrameTime)
     {
-        SDL_assert(maxFixedUpdatesPerTick > 0); // NOLINT(*-else-after-return)
+        assert(maxFixedUpdatesPerTick.maxUpdates > 0);
 
-        const size_t maxUpdates = std::max<size_t>(1, maxFixedUpdatesPerTick);
-        const double tickPeriod = 1.0 / static_cast<double>(fixedUpdateFrequency);
-        const double maxFrameTimeSeconds = maxFrameTime;
+        const size_t maxUpdatesPerFrame = std::max<size_t>(1, maxFixedUpdatesPerTick.maxUpdates);
+        const double fixedTimeStep = 1.0 / static_cast<double>(fixedUpdateFrequency.frequency);
+        const double maxFrameDeltaTime = maxFrameTime;
 
         double accumulatedTime = 0.0;
         size_t accumulatedUpdates = 0;
@@ -101,7 +108,7 @@ namespace psyengine
         while (running_)
         {
             const time::TimePoint now = time::Now();
-            const double frameDelta = std::min(time::Elapsed(lastTime, now), maxFrameTimeSeconds);
+            const double frameDelta = std::min(time::Elapsed(lastTime, now), maxFrameDeltaTime);
 
             lastTime = now;
             accumulatedTime += frameDelta;
@@ -111,24 +118,25 @@ namespace psyengine
             InputManager::instance().update();
 
             // Fixed updates
-            while (accumulatedTime >= tickPeriod && accumulatedUpdates < maxUpdates)
+            while (accumulatedTime >= fixedTimeStep && accumulatedUpdates < maxUpdatesPerFrame)
             {
-                accumulatedTime -= tickPeriod;
+                accumulatedTime -= fixedTimeStep;
                 ++accumulatedUpdates;
-                fixedUpdate(tickPeriod);
+                fixedUpdate(fixedTimeStep);
             }
 
             // Check for lag
-            if (accumulatedTime >= tickPeriod)
+            if (accumulatedTime >= fixedTimeStep)
             {
                 // We’re still behind; drop extra lag but keep phase remainder
-                const double remainder = std::fmod(accumulatedTime, tickPeriod);
+                const double remainder = std::fmod(accumulatedTime, fixedTimeStep);
                 accumulatedTime = remainder;
                 lagging_ = true;
 
                 // Throttle warning to 1/sec
                 if (time::Elapsed(lastLagWarnTime, now) > 1.0)
                 {
+                    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg) — SDL logging uses C-style varargs by design
                     SDL_Log("Warning: fixed update lagging, dropped extra steps");
                     lastLagWarnTime = now;
                 }
@@ -146,7 +154,7 @@ namespace psyengine
             update(frameDelta);
 
             // Interpolation factor for smooth rendering
-            const auto interpolationFactor = static_cast<float>(accumulatedTime / tickPeriod);
+            const auto interpolationFactor = static_cast<float>(accumulatedTime / fixedTimeStep);
             render(interpolationFactor);
 
             // Yield a bit to reduce cpu usage
@@ -244,9 +252,9 @@ namespace psyengine
     void SdlRuntime::render(const float interpolationFactor) const
     {
         // CornFlowerBlue
-        SDL_SetRenderDrawColorFloat(renderer_.get(), 0.392f, 0.584f, 0.929f, 1.0f);
+        SDL_SetRenderDrawColorFloat(renderer_.get(), 0.392F, 0.584F, 0.929F, 1.0F);
         SDL_RenderClear(renderer_.get());
-        SDL_SetRenderDrawColorFloat(renderer_.get(), 1.0f, 1.0f, 1.0f, 1.0f);
+        SDL_SetRenderDrawColorFloat(renderer_.get(), 1.0F, 1.0F, 1.0F, 1.0F);
 
         StateManager::instance().render(renderer_.get(), interpolationFactor);
 

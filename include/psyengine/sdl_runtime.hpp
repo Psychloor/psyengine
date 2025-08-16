@@ -27,7 +27,7 @@ namespace psyengine
      * - Lag control: caps the number of fixed updates per frame and drops excess steps while preserving the interpolation phase.
      *
      * Typical usage:
-     * 1) Construct or make_shared SdlRuntime.
+     * 1) Construct SdlRuntime with make_shared.
      * 2) Call init() to create the window/renderer and initialize SDL subsystems.
      * 3) Push your initial state to the state manager.
      * 4) Call run() with a desired fixed timestep (e.g., 1/60 s).
@@ -39,6 +39,26 @@ namespace psyengine
     class SdlRuntime : public std::enable_shared_from_this<SdlRuntime>
     {
     public:
+        struct FixedUpdateFrequency
+        {
+            explicit constexpr FixedUpdateFrequency(const size_t value = 60) :
+                frequency(value)
+            {}
+
+            size_t frequency;
+        };
+
+        struct MaxFixedUpdatesPerTick
+        {
+            // ReSharper disable once CppDFAConstantParameter
+            explicit constexpr MaxFixedUpdatesPerTick(const size_t value) :
+                maxUpdates(value)
+            {}
+
+            size_t maxUpdates;
+        };
+
+        SdlRuntime() = default;
         PSYENGINE_EXPORT ~SdlRuntime();
 
         /**
@@ -53,7 +73,7 @@ namespace psyengine
          * @param resizeableWindow If true, the window is resizable.
          * @return true on success; false if any subsystem or window/renderer creation fails.
          */
-       PSYENGINE_EXPORT bool init(const std::string& title, int width, int height, bool resizeableWindow = false);
+        PSYENGINE_EXPORT bool init(const std::string& title, int width, int height, bool resizeableWindow = false);
 
         /**
          * Runs the main game loop with a fixed update rate and variable frame rate rendering.
@@ -74,8 +94,9 @@ namespace psyengine
          * @param maxFixedUpdatesPerTick The maximum allowed fixed updates to process in a single frame.
          * @param maxFrameTime The maximum frame time to cap the elapsed time between frames.
          */
-        PSYENGINE_EXPORT void run(size_t fixedUpdateFrequency, size_t maxFixedUpdatesPerTick = 10,
-                 double maxFrameTime = 1.0);
+        PSYENGINE_EXPORT void run(FixedUpdateFrequency fixedUpdateFrequency,
+                                  MaxFixedUpdatesPerTick maxFixedUpdatesPerTick = MaxFixedUpdatesPerTick(10),
+                                  double maxFrameTime = 1.0);
 
         /// Sets the window title.
         /// @return true on success.
@@ -86,7 +107,7 @@ namespace psyengine
 
         /// Toggles fullscreen mode.
         /// @return true on success.
-       PSYENGINE_EXPORT bool setWindowFullscreen(bool fullscreen) const;
+        PSYENGINE_EXPORT bool setWindowFullscreen(bool fullscreen) const;
 
         /// Enables/disables VSync on the window surface, if supported.
         /// @return true on success.
@@ -96,16 +117,42 @@ namespace psyengine
         PSYENGINE_EXPORT void quit();
 
         /// @return true while the main loop is running.
-       PSYENGINE_EXPORT bool isRunning() const;
+        PSYENGINE_EXPORT bool isRunning() const;
 
         /// @return true if the runtime is dropping fixed steps due to lag.
-       PSYENGINE_EXPORT bool isLagging() const;
+        PSYENGINE_EXPORT bool isLagging() const;
 
         /// @return Raw SDL window handle (owned by this runtime).
         PSYENGINE_EXPORT SDL_Window* window() const;
 
         /// @return Raw SDL renderer handle (owned by this runtime).
         PSYENGINE_EXPORT SDL_Renderer* renderer() const;
+
+        SdlRuntime(const SdlRuntime& other) = delete;
+
+        SdlRuntime(SdlRuntime&& other) noexcept :
+            std::enable_shared_from_this<SdlRuntime>(other),
+            running_(other.running_),
+            lagging_(other.lagging_),
+            window_(std::move(other.window_)),
+            renderer_(std::move(other.renderer_))
+        {}
+
+        SdlRuntime& operator=(const SdlRuntime& other) = delete;
+
+        SdlRuntime& operator=(SdlRuntime&& other) noexcept
+        {
+            if (this == &other)
+            {
+                return *this;
+            }
+            std::enable_shared_from_this<SdlRuntime>::operator =(other);
+            running_ = other.running_;
+            lagging_ = other.lagging_;
+            window_ = std::move(other.window_);
+            renderer_ = std::move(other.renderer_);
+            return *this;
+        }
 
     private:
         /// Polls SDL events, forwards to input and state managers, and handles quit requests.

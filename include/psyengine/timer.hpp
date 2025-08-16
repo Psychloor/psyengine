@@ -109,18 +109,21 @@ namespace psyengine::time
         return std::numeric_limits<TimePoint>::min();
     }
 
-    class PSYENGINE_EXPORT DeltaTimer {
+    class PSYENGINE_EXPORT DeltaTimer
+    {
     public:
-        template<std::floating_point T = float>
-        [[nodiscard]] T getDelta() noexcept {
+        template <std::floating_point T = float>
+        [[nodiscard]] T getDelta() noexcept
+        {
             const TimePoint current = Now();
             const T delta = Elapsed<T>(lastTime_, current);
             lastTime_ = current;
             return delta;
         }
 
-        template<std::floating_point T = float>
-        [[nodiscard]] T getDeltaClamped(T maxDelta = static_cast<T>(1.0/30.0)) noexcept {
+        template <std::floating_point T = float>
+        [[nodiscard]] T getDeltaClamped(T maxDelta = static_cast<T>(1.0 / 30.0)) noexcept
+        {
             const TimePoint current = Now();
             const T delta = ElapsedClamped<T>(lastTime_, current, maxDelta);
             lastTime_ = current;
@@ -131,27 +134,33 @@ namespace psyengine::time
         TimePoint lastTime_ = Now();
     };
 
-    class PSYENGINE_EXPORT Timer {
+    class PSYENGINE_EXPORT Timer
+    {
     public:
-        void start() noexcept {
+        void start() noexcept
+        {
             startTime_ = Now();
             running_ = true;
         }
 
-        void reset() noexcept {
+        void reset() noexcept
+        {
             startTime_ = Now();
         }
 
-        template<std::floating_point T = float>
-        [[nodiscard]] T elapsed() const noexcept {
+        template <std::floating_point T = float>
+        [[nodiscard]] T elapsed() const noexcept
+        {
             return running_ ? ElapsedSince<T>(startTime_) : T{0};
         }
 
-        [[nodiscard]] bool isRunning() const noexcept {
+        [[nodiscard]] bool isRunning() const noexcept
+        {
             return running_;
         }
 
-        void stop() noexcept {
+        void stop() noexcept
+        {
             running_ = false;
         }
 

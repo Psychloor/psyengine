@@ -33,9 +33,9 @@ namespace psyengine
     {
         return forEachBinding(actionName, [](const Binding& b, const InputManager& mgr)
         {
-            return std::visit([&]<typename TBinding>(TBinding&& bind) -> bool
+            return std::visit([&mgr]<typename TBind>(TBind& bind) -> bool
             {
-                using T = std::decay_t<TBinding>;
+                using T = std::decay_t<TBind>;
                 if constexpr (std::is_same_v<T, KeyBinding>)
                 {
                     return mgr.isClicked(bind.key);
@@ -60,7 +60,7 @@ namespace psyengine
     {
         return forEachBinding(actionName, [](const Binding& b, const InputManager& mgr)
         {
-            return std::visit([&]<typename TBinding>(TBinding&& bind) -> bool
+            return std::visit([&]<typename TBinding>(TBinding& bind) -> bool
             {
                 using T = std::decay_t<TBinding>;
                 if constexpr (std::is_same_v<T, KeyBinding>)
@@ -87,7 +87,7 @@ namespace psyengine
     {
         return forEachBinding(actionName, [](const Binding& b, const InputManager& mgr)
         {
-            return std::visit([&]<typename TBinding>(TBinding&& bind) -> bool
+            return std::visit([&]<typename TBinding>(TBinding& bind) -> bool
             {
                 using T = std::decay_t<TBinding>;
                 if constexpr (std::is_same_v<T, KeyBinding>)
@@ -114,7 +114,7 @@ namespace psyengine
     {
         return forEachBinding(actionName, [](const Binding& b, const InputManager& mgr)
         {
-            return std::visit([&]<typename TBinding>(TBinding&& bind) -> bool
+            return std::visit([&]<typename TBinding>(TBinding& bind) -> bool
             {
                 using T = std::decay_t<TBinding>;
                 if constexpr (std::is_same_v<T, KeyBinding>)
@@ -272,8 +272,8 @@ namespace psyengine
 
     float InputManager::getAxisNormalized(const SDL_GamepadAxis gamepadAxis, const SDL_JoystickID joystickId) const
     {
-        static constexpr float INV_POS = 1.0f / static_cast<float>(SDL_JOYSTICK_AXIS_MAX);
-        static constexpr float INV_NEG = 1.0f / static_cast<float>(-SDL_JOYSTICK_AXIS_MIN);
+        static constexpr float INV_POS = 1.0F / static_cast<float>(SDL_JOYSTICK_AXIS_MAX);
+        static constexpr float INV_NEG = 1.0F / static_cast<float>(-SDL_JOYSTICK_AXIS_MIN);
 
         const Sint16 raw = getAxisRaw(gamepadAxis, joystickId);
         const float scale = (raw >= 0) ? INV_POS : INV_NEG;

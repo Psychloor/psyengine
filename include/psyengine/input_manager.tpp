@@ -8,7 +8,7 @@ bool InputManager::forEachBinding(const std::string& actionName, Func&& func) co
     {
         for (const auto& binding : it->second.bindings)
         {
-            if (func(binding, *this))
+            if (std::forward<Func>(func)(binding, *this))
                 return true; // any binding is enough to return true
         }
     }

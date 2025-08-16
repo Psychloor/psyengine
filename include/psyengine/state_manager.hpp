@@ -22,7 +22,6 @@ namespace psyengine
     class StateManager
     {
     public:
-
         /**
          * Provides access to the singleton instance of StateManager.
          * Ensures a single, globally accessible instance throughout the application lifecycle.
@@ -46,7 +45,7 @@ namespace psyengine
          * @param deltaTime The fixed time step (in seconds) used for updating
          *                  the current state's logic.
          */
-       PSYENGINE_EXPORT  void fixedUpdate(double deltaTime) const;
+        PSYENGINE_EXPORT void fixedUpdate(double deltaTime) const;
 
         /**
          * Updates the current state or context based on the implemented functionality.
@@ -107,7 +106,10 @@ namespace psyengine
          *
          * @return true if the state stack is empty, false otherwise.
          */
-        [[nodiscard]] PSYENGINE_EXPORT bool empty() const noexcept { return states_.empty(); }
+        [[nodiscard]] PSYENGINE_EXPORT bool empty() const noexcept
+        {
+            return states_.empty();
+        }
 
         /**
          * Retrieves the current state from the state stack without removing it.
@@ -115,7 +117,10 @@ namespace psyengine
          *
          * @return The current state at the top of the stack.
          **/
-        [[nodiscard]] PSYENGINE_EXPORT BaseState* current() const noexcept { return states_.empty() ? nullptr : states_.back().get(); }
+        [[nodiscard]] PSYENGINE_EXPORT BaseState* current() const noexcept
+        {
+            return states_.empty() ? nullptr : states_.back().get();
+        }
 
         /**
          * Copy constructor is deleted to prevent copying of the StateManager instance.

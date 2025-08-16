@@ -99,7 +99,7 @@ namespace psyengine::raii
      */
     struct PSYENGINE_EXPORT SdlMixerDestroyer
     {
-        void operator()(MIX_Mixer* mixer) const
+        void operator()(MIX_Mixer * mixer) const
         {
             MIX_DestroyMixer(mixer);
         }
@@ -117,7 +117,7 @@ namespace psyengine::raii
      */
     struct PSYENGINE_EXPORT SdlTtfDestroyer
     {
-        void operator()(TTF_Font* font) const
+        void operator()(TTF_Font * font) const
         {
             TTF_CloseFont(font);
         }

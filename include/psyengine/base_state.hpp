@@ -34,6 +34,22 @@ namespace psyengine
          */
         virtual ~BaseState() = default;
 
+        BaseState(const BaseState& other) = delete;
+        BaseState& operator=(const BaseState& other) = delete;
+
+        BaseState(BaseState&&) noexcept
+        {}
+
+        BaseState& operator=(BaseState&& other) noexcept
+        {
+            if (this == &other)
+            {
+                return *this;
+            }
+
+            return *this;
+        }
+
     protected:
         /**
          * @class StateManager
@@ -52,7 +68,10 @@ namespace psyengine
          *
          * @return True if the state entered successfully, false otherwise.
          */
-        virtual bool onEnter() { return true; };
+        virtual bool onEnter()
+        {
+            return true;
+        };
 
         /**
          * A pure virtual method meant to be overridden by derived classes.
