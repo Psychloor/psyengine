@@ -184,6 +184,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
         CXX_VISIBILITY_PRESET hidden
         VISIBILITY_INLINES_HIDDEN ON
         UNITY_BUILD ${PSYENGINE_UNITY}
+        FOLDER "psyengine"
 )
 
 # Link-time optimization

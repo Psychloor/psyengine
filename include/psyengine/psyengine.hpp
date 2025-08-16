@@ -5,6 +5,8 @@
 #ifndef PSYENGINE_HPP
 #define PSYENGINE_HPP
 
+#include "psyengine/debug/assert.hpp"
+
 #include "psyengine/input/input_manager.hpp"
 
 #include "psyengine/platform/sdl_runtime.hpp"
