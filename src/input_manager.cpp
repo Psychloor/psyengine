@@ -260,9 +260,9 @@ namespace psyengine::input
 
     Sint16 InputManager::getAxisRaw(const SDL_GamepadAxis gamepadAxis, const SDL_JoystickID joystickId) const
     {
-        if (const auto it = axes_.find(joystickId); it != axes_.end())
+        if (const auto it = axes_.find(joystickId); it != std::end(axes_))
         {
-            if (const auto axesIt = it->second.find(gamepadAxis); axesIt != it->second.end())
+            if (const auto axesIt = it->second.find(gamepadAxis); axesIt != std::end(it->second))
             {
                 return axesIt->second.value;
             }
@@ -335,9 +335,9 @@ namespace psyengine::input
     InputManager::ButtonState InputManager::getButtonState(const SDL_GamepadButton button,
                                                            const SDL_JoystickID joystickId) const
     {
-        if (const auto it = gamepadButtons_.find(joystickId); it != gamepadButtons_.end())
+        if (const auto it = gamepadButtons_.find(joystickId); it != std::end(gamepadButtons_))
         {
-            if (const auto buttonIt = it->second.find(button); buttonIt != it->second.end())
+            if (const auto buttonIt = it->second.find(button); buttonIt != std::end(it->second))
             {
                 return buttonIt->second.state;
             }
@@ -347,7 +347,7 @@ namespace psyengine::input
 
     InputManager::ButtonState InputManager::getButtonState(const SDL_Keycode key) const
     {
-        if (const auto it = keyboardButtons_.find(key); it != keyboardButtons_.end())
+        if (const auto it = keyboardButtons_.find(key); it != std::end(keyboardButtons_))
         {
             return it->second.state;
         }
@@ -356,7 +356,7 @@ namespace psyengine::input
 
     InputManager::ButtonState InputManager::getButtonState(const Uint8 mouseButton) const
     {
-        if (const auto it = mouseButtons_.find(mouseButton); it != mouseButtons_.end())
+        if (const auto it = mouseButtons_.find(mouseButton); it != std::end(mouseButtons_))
         {
             return it->second.state;
         }

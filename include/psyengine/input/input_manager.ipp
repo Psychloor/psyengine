@@ -8,7 +8,7 @@ namespace psyengine::input
     template <typename Func>
     bool InputManager::forEachBinding(const std::string& actionName, Func&& func) const
     {
-        if (const auto it = actions_.find(actionName); it != actions_.end())
+        if (const auto it = actions_.find(actionName); it != std::end(actions_))
         {
             for (const auto& binding : it->second.bindings)
             {

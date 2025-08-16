@@ -112,7 +112,7 @@ namespace psyengine::time
     class PSYENGINE_EXPORT DeltaTimer
     {
     public:
-        template <std::floating_point T = float>
+        template <std::floating_point T = double>
         [[nodiscard]] T getDelta() noexcept
         {
             const TimePoint current = Now();
@@ -121,7 +121,7 @@ namespace psyengine::time
             return delta;
         }
 
-        template <std::floating_point T = float>
+        template <std::floating_point T = double>
         [[nodiscard]] T getDeltaClamped(T maxDelta = static_cast<T>(1.0 / 30.0)) noexcept
         {
             const TimePoint current = Now();
@@ -148,7 +148,7 @@ namespace psyengine::time
             startTime_ = Now();
         }
 
-        template <std::floating_point T = float>
+        template <std::floating_point T = double>
         [[nodiscard]] T elapsed() const noexcept
         {
             return running_ ? ElapsedSince<T>(startTime_) : T{0};
@@ -164,7 +164,6 @@ namespace psyengine::time
             running_ = false;
         }
 
-    private:
     private:
         TimePoint startTime_ = 0;
         bool running_ = false;

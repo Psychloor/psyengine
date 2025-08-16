@@ -259,7 +259,7 @@ namespace psyengine::utils
             seedData.push_back(static_cast<std::uint32_t>(z)); // take 32-bit chunks
         }
 
-        std::seed_seq seq(seedData.begin(), seedData.end());
+        std::seed_seq seq(std::begin(seedData), std::end(seedData));
         if constexpr (requires { Engine{seq}; })
         {
             return Engine(seq);
