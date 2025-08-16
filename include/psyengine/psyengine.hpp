@@ -2,7 +2,7 @@
 // Created by blomq on 2025-08-16.
 //
 
-#ifndef HPP
+#ifndef PSYENGINE_HPP
 #define PSYENGINE_HPP
 
 #include "psyengine/base_state.hpp"
