@@ -5,6 +5,9 @@ project(psyengine
         DESCRIPTION "A modern C++ game engine library"
 )
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 # ============================================================================
 # Standard CMake modules
 # ============================================================================
@@ -61,17 +64,21 @@ endif()
 # ============================================================================
 # Source files
 # ============================================================================
-file(GLOB_RECURSE PSYENGINE_SOURCES
-        LIST_DIRECTORIES false
-        CONFIGURE_DEPENDS
-        src/*.cpp
+set(PSYENGINE_SOURCES
+        src/input_manager.cpp
+        src/sdl_runtime.cpp
+        src/state_manager.cpp
 )
 
-file(GLOB_RECURSE PSYENGINE_HEADERS
-        LIST_DIRECTORIES false
-        CONFIGURE_DEPENDS
-        include/psyengine/*.hpp
-        include/psyengine/*.tpp
+set(PSYENGINE_HEADERS
+        include/psyengine/base_state.hpp
+        include/psyengine/input_manager.hpp
+        include/psyengine/input_manager.ipp
+        include/psyengine/random_utils.hpp
+        include/psyengine/sdl_raii.hpp
+        include/psyengine/sdl_runtime.hpp
+        include/psyengine/state_manager.hpp
+        include/psyengine/timer.hpp
 )
 
 # ============================================================================
@@ -96,9 +103,11 @@ generate_export_header(${PROJECT_NAME}
 # ============================================================================
 target_sources(${PROJECT_NAME}
         PRIVATE ${PSYENGINE_SOURCES}
+
         PUBLIC FILE_SET HEADERS
         BASE_DIRS include
         FILES ${PSYENGINE_HEADERS}
+
         PUBLIC FILE_SET generated_headers
         TYPE HEADERS
         BASE_DIRS ${CMAKE_CURRENT_BINARY_DIR}
@@ -119,21 +128,22 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${PSYENGINE_SDL_LIBRARIES})
 # ============================================================================
 # Compiler warnings and flags
 # ============================================================================
+# Warnings (per-compiler)
+if (MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 $<$<BOOL:${PSYENGINE_WERROR}>:/WX> /permissive- /Zc:__cplusplus)
+else ()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        target_compile_options(${PROJECT_NAME} PRIVATE -Wconversion -Wsign-conversion $<$<BOOL:${PSYENGINE_WERROR}>:-Werror>)
+    endif ()
+endif ()
+
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE
-            /W4
-            /utf-8  # Force UTF-8 encoding
-            $<$<BOOL:${PSYENGINE_WERROR}>:/WX>
-    )
     target_compile_definitions(${PROJECT_NAME} PRIVATE
             WIN32_LEAN_AND_MEAN
             NOMINMAX
             _CRT_SECURE_NO_WARNINGS
-    )
-else()
-    target_compile_options(${PROJECT_NAME} PRIVATE
-            -Wall -Wextra -Wpedantic
-            $<$<BOOL:${PSYENGINE_WERROR}>:-Werror>
+            /utf-8  # Force UTF-8 encoding
     )
 endif()
 
