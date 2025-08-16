@@ -31,14 +31,6 @@ option(PSYENGINE_ADDRESS_SANITIZE "Enable Address Sanitizer for debug builds" ON
 option(PSYENGINE_BUILD_SHARED "Build as shared library" ON)
 
 # ============================================================================
-# Compiler-specific optimizations
-# ============================================================================
-if(MSVC AND NOT CMAKE_GENERATOR STREQUAL "Ninja")
-    # Enable parallel compilation for MSVC (except when using Ninja)
-    add_compile_options(/MP)
-endif()
-
-# ============================================================================
 # Dependencies
 # ============================================================================
 find_package(SDL3 CONFIG REQUIRED)
@@ -71,14 +63,20 @@ set(PSYENGINE_SOURCES
 )
 
 set(PSYENGINE_HEADERS
-        include/psyengine/base_state.hpp
-        include/psyengine/input_manager.hpp
-        include/psyengine/input_manager.ipp
-        include/psyengine/random_utils.hpp
-        include/psyengine/sdl_raii.hpp
-        include/psyengine/sdl_runtime.hpp
-        include/psyengine/state_manager.hpp
-        include/psyengine/timer.hpp
+        include/psyengine/debug/assert.hpp
+
+        include/psyengine/input/input_manager.hpp
+        include/psyengine/input/input_manager.ipp
+
+        include/psyengine/platform/sdl_raii.hpp
+        include/psyengine/platform/sdl_runtime.hpp
+
+        include/psyengine/state/base_state.hpp
+        include/psyengine/state/state_manager.hpp
+
+        include/psyengine/time/timer.hpp
+
+        include/psyengine/utils/utils.hpp
 )
 
 # ============================================================================
@@ -124,6 +122,14 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PSYENGINE_SDL_LIBRARIES})
+
+# ============================================================================
+# Compiler-specific optimizations
+# ============================================================================
+if (MSVC AND NOT CMAKE_GENERATOR STREQUAL "Ninja")
+    # Enable parallel compilation for MSVC (except when using Ninja)
+    target_compile_options(${PROJECT_NAME} PRIVATE /MP)
+endif ()
 
 # ============================================================================
 # Compiler warnings and flags

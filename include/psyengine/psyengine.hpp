@@ -5,12 +5,16 @@
 #ifndef PSYENGINE_HPP
 #define PSYENGINE_HPP
 
-#include "psyengine/base_state.hpp"
-#include "psyengine/input_manager.hpp"
-#include "psyengine/random_utils.hpp"
-#include "psyengine/sdl_runtime.hpp"
-#include "psyengine/state_manager.hpp"
-#include "psyengine/timer.hpp"
+#include "psyengine/input/input_manager.hpp"
+
+#include "psyengine/platform/sdl_runtime.hpp"
+
+#include "psyengine/state/base_state.hpp"
+#include "psyengine/state/state_manager.hpp"
+
+#include "psyengine/time/timer.hpp"
+
+#include "psyengine/utils/utils.hpp"
 
 
 #endif //PSYENGINE_HPP

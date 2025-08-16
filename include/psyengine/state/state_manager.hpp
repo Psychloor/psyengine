@@ -12,7 +12,7 @@
 
 #include "base_state.hpp"
 
-namespace psyengine
+namespace psyengine::state
 {
 
     /**

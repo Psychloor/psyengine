@@ -2,7 +2,7 @@
 // Created by blomq on 2025-08-11.
 //
 
-#include "psyengine/sdl_runtime.hpp"
+#include "../include/psyengine/platform/sdl_runtime.hpp"
 
 #ifdef PSYENGINE_WITH_MIXER
 #include <SDL3_mixer/SDL_mixer.h>
@@ -14,15 +14,15 @@
 
 #include <cassert>
 
-#include "psyengine/input_manager.hpp"
-#include "psyengine/state_manager.hpp"
-#include "psyengine/timer.hpp"
+#include "psyengine/input/input_manager.hpp"
+#include "psyengine/state//state_manager.hpp"
+#include "psyengine/time/timer.hpp"
 
-namespace psyengine
+namespace psyengine::platform
 {
     SdlRuntime::~SdlRuntime()
     {
-        StateManager::instance().clear();
+        state::StateManager::instance().clear();
 
         // Ensure SDL objects are destroyed before SDL_Quit
         renderer_.reset();
@@ -82,8 +82,8 @@ namespace psyengine
             return false;
         }
 
-        window_ = raii::SdlWindowPtr(window);
-        renderer_ = raii::SdlRendererPtr(renderer);
+        window_ = SdlWindowPtr(window);
+        renderer_ = SdlRendererPtr(renderer);
 
         return true;
     }
@@ -115,7 +115,7 @@ namespace psyengine
 
             // Events first, then update input for this frame
             handleEvents();
-            InputManager::instance().update();
+            input::InputManager::instance().update();
 
             // Fixed updates
             while (accumulatedTime >= fixedTimeStep && accumulatedUpdates < maxUpdatesPerFrame)
@@ -230,10 +230,10 @@ namespace psyengine
             case SDL_EVENT_GAMEPAD_AXIS_MOTION:
             case SDL_EVENT_GAMEPAD_REMOVED:
                 // Fall through in case people want to use these anyway
-                InputManager::instance().handleEvent(event);
+                input::InputManager::instance().handleEvent(event);
                 [[fallthrough]];
             default:
-                StateManager::instance().handleEvent(event);
+                state::StateManager::instance().handleEvent(event);
                 break;
             }
         }
@@ -241,12 +241,12 @@ namespace psyengine
 
     void SdlRuntime::fixedUpdate(const double deltaTime)
     {
-        StateManager::instance().fixedUpdate(deltaTime);
+        state::StateManager::instance().fixedUpdate(deltaTime);
     }
 
     void SdlRuntime::update(const double deltaTime)
     {
-        StateManager::instance().update(deltaTime);
+        state::StateManager::instance().update(deltaTime);
     }
 
     void SdlRuntime::render(const float interpolationFactor) const
@@ -256,7 +256,7 @@ namespace psyengine
         SDL_RenderClear(renderer_.get());
         SDL_SetRenderDrawColorFloat(renderer_.get(), 1.0F, 1.0F, 1.0F, 1.0F);
 
-        StateManager::instance().render(renderer_.get(), interpolationFactor);
+        state::StateManager::instance().render(renderer_.get(), interpolationFactor);
 
         SDL_RenderPresent(renderer_.get());
     }

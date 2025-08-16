@@ -2,9 +2,9 @@
 // Created by psychloor on 2025-08-11.
 //
 
-#include "psyengine/input_manager.hpp"
+#include "psyengine/input/input_manager.hpp"
 
-namespace psyengine
+namespace psyengine::input
 {
 
     InputManager& InputManager::instance()

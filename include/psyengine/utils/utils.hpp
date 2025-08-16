@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace psyengine::random_utils
+namespace psyengine::utils
 {
     namespace detail
     {
@@ -237,7 +237,7 @@ namespace psyengine::random_utils
      */
     template <typename Engine, typename Seed, typename THasher = std::hash<Seed>>
         requires (std::uniform_random_bit_generator<Engine> &&
-            psyengine::random_utils::detail::SeedSeqConstructibleOrSeedable<Engine> &&
+            psyengine::utils::detail::SeedSeqConstructibleOrSeedable<Engine> &&
             std::invocable<THasher, const Seed&>)
     [[nodiscard]] Engine MakeCustomSeededRngHashed(const Seed& seed, THasher hasher = {})
     {
@@ -247,7 +247,7 @@ namespace psyengine::random_utils
         state = detail::Mix64(state);
 
         // Expand into enough 32-bit words for Engine using splitmix64 progression
-        constexpr std::size_t n = psyengine::random_utils::detail::SeedWordCount<Engine>();
+        constexpr std::size_t n = psyengine::utils::detail::SeedWordCount<Engine>();
         std::vector<std::seed_seq::result_type> seedData;
         seedData.reserve(n);
 
@@ -255,7 +255,7 @@ namespace psyengine::random_utils
         {
             // advance state (golden ratio increment)
             state += 0x9E3779B97F4A7C15ULL;
-            const std::uint64_t z = psyengine::random_utils::detail::Mix64(state);
+            const std::uint64_t z = psyengine::utils::detail::Mix64(state);
             seedData.push_back(static_cast<std::uint32_t>(z)); // take 32-bit chunks
         }
 
@@ -287,7 +287,7 @@ namespace psyengine::random_utils
      */
     template <typename Engine, typename Range, typename THasher>
         requires (std::uniform_random_bit_generator<Engine> &&
-            psyengine::random_utils::detail::SeedSeqConstructibleOrSeedable<Engine> &&
+            psyengine::utils::detail::SeedSeqConstructibleOrSeedable<Engine> &&
             requires(const Range& r) { std::begin(r); std::end(r); } &&
             std::invocable<THasher, const std::ranges::range_value_t<Range>&>)
     [[nodiscard]] Engine MakeCustomSeededRngHashedRange(const Range& items, THasher elemHasher)

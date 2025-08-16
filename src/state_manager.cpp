@@ -2,11 +2,11 @@
 // Created by blomq on 2025-08-11.
 //
 
-#include "psyengine/state_manager.hpp"
+#include "psyengine/state/state_manager.hpp"
 
-#include "psyengine/base_state.hpp"
+#include "psyengine/state/base_state.hpp"
 
-namespace psyengine
+namespace psyengine::state
 {
     StateManager& StateManager::instance()
     {

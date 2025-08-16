@@ -2,7 +2,7 @@
 // Created by blomq on 2025-08-11.
 //
 
-#ifndef PSYENGINE_INPUT_MANAGER_HPP
+#ifndef PSYENGINE_INPUT_MANAGER_HPP // NOLINT(*-redundant-preprocessor) - this is a header guard
 #define PSYENGINE_INPUT_MANAGER_HPP
 
 #include "psyengine_export.h"
@@ -13,9 +13,9 @@
 
 #include <SDL3/SDL.h>
 
-#include "timer.hpp"
+#include "psyengine/time/timer.hpp"
 
-namespace psyengine
+namespace psyengine::input
 {
     /**
      * @class InputManager
@@ -478,9 +478,8 @@ namespace psyengine
         void updateMouseButtons(const time::TimePoint& now);
         void updateKeyboardButtons(const time::TimePoint& now);
     };
+}
 
 #include "input_manager.ipp"
-
-}
 
 #endif //PSYENGINE_INPUT_MANAGER_HPP

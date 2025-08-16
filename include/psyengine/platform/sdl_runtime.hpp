@@ -7,11 +7,13 @@
 
 #include "psyengine_export.h"
 
+#include <memory>
 #include <string>
 
-#include "psyengine/sdl_raii.hpp"
+#include "sdl_raii.hpp"
 
-namespace psyengine
+
+namespace psyengine::platform
 {
     /**
      * @class SdlRuntime
@@ -170,8 +172,8 @@ namespace psyengine
         bool running_{}; ///< Main loop flag.
         bool lagging_{}; ///< Indicates we dropped fixed steps due to lag in the last frame.
 
-        raii::SdlWindowPtr window_ = nullptr;
-        raii::SdlRendererPtr renderer_ = nullptr;
+        SdlWindowPtr window_ = nullptr;
+        SdlRendererPtr renderer_ = nullptr;
 
     };
 }

@@ -1,0 +1,25 @@
+﻿#ifndef INPUT_MANAGER_TPP
+#define INPUT_MANAGER_TPP
+
+#include "input_manager.hpp"
+
+namespace psyengine::input
+{
+    template <typename Func>
+    bool InputManager::forEachBinding(const std::string& actionName, Func&& func) const
+    {
+        if (const auto it = actions_.find(actionName); it != actions_.end())
+        {
+            for (const auto& binding : it->second.bindings)
+            {
+                if (std::forward<Func>(func)(binding, *this))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+
+#endif // INPUT_MANAGER_TPP

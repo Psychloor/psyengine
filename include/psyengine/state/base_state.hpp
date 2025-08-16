@@ -11,7 +11,7 @@
 union SDL_Event;
 struct SDL_Renderer;
 
-namespace psyengine
+namespace psyengine::state
 {
     /**
      * @class BaseState
