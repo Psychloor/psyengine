@@ -479,7 +479,7 @@ namespace psyengine
         void updateKeyboardButtons(const time::TimePoint& now);
     };
 
-#include "input_manager.tpp"
+#include "input_manager.ipp"
 
 }
 
