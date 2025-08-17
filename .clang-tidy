@@ -92,3 +92,5 @@ clang-analyzer-core.UndefinedBinaryOperatorResult,
 clang-analyzer-core.NonnilStringConstants,
 clang-analyzer-nullability.NullablePassedToNonnull,
 clang-analyzer-core.StackAddrEscapeBase'
+HeaderFilterRegex: '.*'
+AnalyzeTemporaryDtors: true

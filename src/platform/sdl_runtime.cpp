@@ -2,7 +2,7 @@
 // Created by blomq on 2025-08-11.
 //
 
-#include "../include/psyengine/platform/sdl_runtime.hpp"
+#include "../../include/psyengine/platform/sdl_runtime.hpp"
 
 #ifdef PSYENGINE_WITH_MIXER
 #include <SDL3_mixer/SDL_mixer.h>

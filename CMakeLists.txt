@@ -57,26 +57,36 @@ endif()
 # Source files
 # ============================================================================
 set(PSYENGINE_SOURCES
-        src/input_manager.cpp
-        src/sdl_runtime.cpp
-        src/state_manager.cpp
+        src/input/input_manager.cpp
+        src/platform/sdl_runtime.cpp
+        src/state/state_manager.cpp
+        src/texture_manager.cpp
+        src/time/clock.cpp
 )
 
 set(PSYENGINE_HEADERS
+        include/psyengine/psyengine.hpp
+
         include/psyengine/debug/assert.hpp
 
         include/psyengine/input/input_manager.hpp
         include/psyengine/input/input_manager.ipp
 
+        include/psyengine/math/vector2.hpp
+        include/psyengine/math/vector2.ipp
+
         include/psyengine/platform/sdl_raii.hpp
         include/psyengine/platform/sdl_runtime.hpp
+
+        include/psyengine/resources/texture_manager.hpp
 
         include/psyengine/state/base_state.hpp
         include/psyengine/state/state_manager.hpp
 
+        include/psyengine/time/clock.hpp
         include/psyengine/time/timer.hpp
 
-        include/psyengine/utils/utils.hpp
+        include/psyengine/utils/random_utils.hpp
 )
 
 # ============================================================================
