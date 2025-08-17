@@ -5,8 +5,6 @@
 #ifndef PSYENGINE_RANDOM_UTILS_HPP
 #define PSYENGINE_RANDOM_UTILS_HPP
 
-#include "psyengine_export.h"
-
 #include <algorithm>
 #include <array>
 #include <functional>
@@ -29,7 +27,7 @@ namespace psyengine::utils
          * @tparam U A placeholder template parameter for SFINAE defaults to `void`.
          */
         template <typename T, typename U = void>
-        struct PSYENGINE_EXPORT HasStateSize : std::false_type
+        struct  HasStateSize : std::false_type
         {};
 
         /**
@@ -140,7 +138,7 @@ namespace psyengine::utils
          * @param x The 64-bit unsigned integer to be mixed.
          * @return The mixed 64-bit unsigned integer.
          */
-        inline PSYENGINE_EXPORT std::uint64_t Mix64(std::uint64_t x)
+        inline  std::uint64_t Mix64(std::uint64_t x)
         {
             x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9ULL;
             x = (x ^ (x >> 27)) * 0x94D049BB133111EBULL;
@@ -332,7 +330,7 @@ namespace psyengine::utils
      * @note Proper seeding ensures that the RNG produces a random enough and non-repeating
      * sequence of numbers.
      */
-    PSYENGINE_EXPORT inline auto MakeMersenne32()
+     inline auto MakeMersenne32()
     {
         return MakeSeededRng<Mersenne32>();
     }
@@ -350,7 +348,7 @@ namespace psyengine::utils
      * @note Proper seeding ensures that the RNG produces a random enough and non-repeating
      * sequence of numbers.
      */
-    PSYENGINE_EXPORT inline auto MakeMersenne64()
+     inline auto MakeMersenne64()
     {
         return MakeSeededRng<Mersenne64>();
     }
@@ -425,7 +423,7 @@ namespace psyengine::utils
     }
 
     // Thread-safe global RNG
-    class PSYENGINE_EXPORT GlobalRng
+    class  GlobalRng
     {
     public:
         static auto& get()

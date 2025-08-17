@@ -14,8 +14,13 @@ namespace psyengine::math
 {
 
     template <typename T> requires std::is_arithmetic_v<T>
-    Vector2<T>::Vector2(const T x, const T y): // NOLINT(*-easily-swappable-parameters)
+    Vector2<T>::Vector2(const T x, const T y) : // NOLINT(*-easily-swappable-parameters)
         x(x), y(y)
+    {}
+
+    template <typename T> requires std::is_arithmetic_v<T>
+    constexpr Vector2<T>::Vector2(const T value) :
+        x(value), y(value)
     {}
 
     template <typename T> requires std::is_arithmetic_v<T>
@@ -108,14 +113,10 @@ namespace psyengine::math
     template <typename T> requires std::is_arithmetic_v<T>
     bool Vector2<T>::operator!=(const Vector2& other) const
     {
-        return std::abs(x - other.x) >= std::numeric_limits<T>::epsilon() || std::abs(y - other.y) >= std::numeric_limits<
-            T>::epsilon();
+        return std::abs(x - other.x) >= std::numeric_limits<T>::epsilon() || std::abs(y - other.y) >=
+            std::numeric_limits<
+                T>::epsilon();
     }
-
-    template <typename T> requires std::is_arithmetic_v<T>
-    constexpr Vector2<T>::Vector2(const T value):
-        x(value), y(value)
-    {}
 
     template <typename T> requires std::is_arithmetic_v<T>
     consteval Vector2<T> Vector2<T>::operator*(T scalar)

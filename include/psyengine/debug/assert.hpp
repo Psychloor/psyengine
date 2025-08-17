@@ -10,12 +10,12 @@
 
 #include <SDL3/SDL_assert.h>
 
-#include "psyengine_export.h"
+
 
 namespace psyengine::debug
 {
 
-    PSYENGINE_EXPORT inline void Assert(const bool condition,
+     inline void Assert(const bool condition,
                                         [[maybe_unused]] const std::string_view message,
                                         [[maybe_unused]] const std::source_location& location =
                                             std::source_location::current())
@@ -24,7 +24,7 @@ namespace psyengine::debug
     }
 
 #ifndef NDEBUG
-    PSYENGINE_EXPORT inline void DebugAssert(const bool condition,
+     inline void DebugAssert(const bool condition,
                                              const std::string_view message,
                                              const std::source_location location = std::source_location::current())
     {

@@ -5,7 +5,7 @@
 #ifndef PSYENGINE_TIMER_HPP
 #define PSYENGINE_TIMER_HPP
 
-#include "psyengine_export.h"
+
 
 #include <concepts>
 #include <limits>
@@ -20,7 +20,7 @@ namespace psyengine::time
      * Retrieves the performance counter frequency (ticks per second).
      * The value is cached on the first call.
      */
-    [[nodiscard]] PSYENGINE_EXPORT inline TimePoint PerformanceFrequency() noexcept
+    [[nodiscard]]  inline TimePoint PerformanceFrequency() noexcept
     {
         static const TimePoint FREQ = SDL_GetPerformanceFrequency();
         return FREQ;
@@ -29,7 +29,7 @@ namespace psyengine::time
     /**
      * Retrieves the current performance counter-value.
      */
-    [[nodiscard]] PSYENGINE_EXPORT inline TimePoint Now() noexcept
+    [[nodiscard]]  inline TimePoint Now() noexcept
     {
         return SDL_GetPerformanceCounter();
     }
@@ -109,7 +109,7 @@ namespace psyengine::time
         return std::numeric_limits<TimePoint>::min();
     }
 
-    class PSYENGINE_EXPORT DeltaTimer
+    class  DeltaTimer
     {
     public:
         template <std::floating_point T = double>
@@ -134,7 +134,7 @@ namespace psyengine::time
         TimePoint lastTime_ = Now();
     };
 
-    class PSYENGINE_EXPORT Timer
+    class  Timer
     {
     public:
         void start() noexcept

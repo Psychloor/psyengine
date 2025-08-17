@@ -5,7 +5,7 @@
 #ifndef PSYENGINE_BASE_STATE_HPP
 #define PSYENGINE_BASE_STATE_HPP
 
-#include "psyengine_export.h"
+
 
 // ReSharper disable twice CppInconsistentNaming
 union SDL_Event;
@@ -21,7 +21,7 @@ namespace psyengine::state
      * must or can implement to define their specific behavior. These methods
      * facilitate the actions needed during a game's state transitions and interactions.
      */
-    class PSYENGINE_EXPORT BaseState
+    class  BaseState
     {
 
     public:

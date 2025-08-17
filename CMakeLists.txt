@@ -13,7 +13,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # ============================================================================
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
-include(GenerateExportHeader)
 include(CheckIPOSupported)
 
 # ============================================================================
@@ -28,7 +27,6 @@ option(PSYENGINE_WITH_IMAGE "Enable SDL_image support" ON)
 option(PSYENGINE_WITH_MIXER "Enable SDL_mixer support" ON)
 option(PSYENGINE_WITH_TTF "Enable SDL_ttf support" ON)
 option(PSYENGINE_ADDRESS_SANITIZE "Enable Address Sanitizer for debug builds" ON)
-option(PSYENGINE_BUILD_SHARED "Build as shared library" ON)
 
 # ============================================================================
 # Dependencies
@@ -92,19 +90,9 @@ set(PSYENGINE_HEADERS
 # ============================================================================
 # Create library target
 # ============================================================================
-if(PSYENGINE_BUILD_SHARED)
-    add_library(${PROJECT_NAME} SHARED)
-else()
-    add_library(${PROJECT_NAME} STATIC)
-endif()
+add_library(${PROJECT_NAME} STATIC)
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
-
-# Generate export header
-generate_export_header(${PROJECT_NAME}
-        BASE_NAME ${PROJECT_NAME}
-        EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h
-)
 
 # ============================================================================
 # Target configuration
@@ -115,11 +103,6 @@ target_sources(${PROJECT_NAME}
         PUBLIC FILE_SET HEADERS
         BASE_DIRS include
         FILES ${PSYENGINE_HEADERS}
-
-        PUBLIC FILE_SET generated_headers
-        TYPE HEADERS
-        BASE_DIRS ${CMAKE_CURRENT_BINARY_DIR}
-        FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
@@ -127,7 +110,6 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 target_include_directories(${PROJECT_NAME}
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
@@ -194,7 +176,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
         CXX_VISIBILITY_PRESET hidden
         VISIBILITY_INLINES_HIDDEN ON
         UNITY_BUILD ${PSYENGINE_UNITY}
-        FOLDER "psyengine"
 )
 
 # Link-time optimization
@@ -248,7 +229,6 @@ if(PSYENGINE_INSTALL)
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
             FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-            FILE_SET generated_headers DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     )
 
     # Export targets for find_package()
