@@ -63,8 +63,6 @@ set(PSYENGINE_SOURCES
 )
 
 set(PSYENGINE_HEADERS
-        include/psyengine/psyengine.hpp
-
         include/psyengine/debug/assert.hpp
 
         include/psyengine/input/input_manager.hpp
@@ -85,6 +83,8 @@ set(PSYENGINE_HEADERS
         include/psyengine/time/timer.hpp
 
         include/psyengine/utils/random_utils.hpp
+
+        include/psyengine/psyengine.hpp
 )
 
 # ============================================================================
