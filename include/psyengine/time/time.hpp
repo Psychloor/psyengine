@@ -5,8 +5,6 @@
 #ifndef PSYENGINE_TIMER_HPP
 #define PSYENGINE_TIMER_HPP
 
-
-
 #include <concepts>
 #include <limits>
 
@@ -20,7 +18,7 @@ namespace psyengine::time
      * Retrieves the performance counter frequency (ticks per second).
      * The value is cached on the first call.
      */
-    [[nodiscard]]  inline TimePoint PerformanceFrequency() noexcept
+    [[nodiscard]] inline TimePoint PerformanceFrequency() noexcept
     {
         static const TimePoint FREQ = SDL_GetPerformanceFrequency();
         return FREQ;
@@ -29,7 +27,7 @@ namespace psyengine::time
     /**
      * Retrieves the current performance counter-value.
      */
-    [[nodiscard]]  inline TimePoint Now() noexcept
+    [[nodiscard]] inline TimePoint Now() noexcept
     {
         return SDL_GetPerformanceCounter();
     }
@@ -108,66 +106,6 @@ namespace psyengine::time
     {
         return std::numeric_limits<TimePoint>::min();
     }
-
-    class  DeltaTimer
-    {
-    public:
-        template <std::floating_point T = double>
-        [[nodiscard]] T getDelta() noexcept
-        {
-            const TimePoint current = Now();
-            const T delta = Elapsed<T>(lastTime_, current);
-            lastTime_ = current;
-            return delta;
-        }
-
-        template <std::floating_point T = double>
-        [[nodiscard]] T getDeltaClamped(T maxDelta = static_cast<T>(1.0 / 30.0)) noexcept
-        {
-            const TimePoint current = Now();
-            const T delta = ElapsedClamped<T>(lastTime_, current, maxDelta);
-            lastTime_ = current;
-            return delta;
-        }
-
-    private:
-        TimePoint lastTime_ = Now();
-    };
-
-    class  Timer
-    {
-    public:
-        void start() noexcept
-        {
-            startTime_ = Now();
-            running_ = true;
-        }
-
-        void reset() noexcept
-        {
-            startTime_ = Now();
-        }
-
-        template <std::floating_point T = double>
-        [[nodiscard]] T elapsed() const noexcept
-        {
-            return running_ ? ElapsedSince<T>(startTime_) : T{0};
-        }
-
-        [[nodiscard]] bool isRunning() const noexcept
-        {
-            return running_;
-        }
-
-        void stop() noexcept
-        {
-            running_ = false;
-        }
-
-    private:
-        TimePoint startTime_ = 0;
-        bool running_ = false;
-    };
 }
 
 #endif //PSYENGINE_TIMER_HPP

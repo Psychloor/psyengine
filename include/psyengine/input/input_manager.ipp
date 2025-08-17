@@ -1,5 +1,5 @@
-﻿#ifndef INPUT_MANAGER_TPP
-#define INPUT_MANAGER_TPP
+﻿#ifndef PSYENGINE_INPUT_MANAGER_IPP
+#define PSYENGINE_INPUT_MANAGER_IPP
 
 #include "input_manager.hpp"
 
@@ -22,4 +22,4 @@ namespace psyengine::input
     }
 }
 
-#endif // INPUT_MANAGER_TPP
+#endif // PSYENGINE_INPUT_MANAGER_IPP

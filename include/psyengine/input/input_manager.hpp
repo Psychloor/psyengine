@@ -5,15 +5,13 @@
 #ifndef PSYENGINE_INPUT_MANAGER_HPP // NOLINT(*-redundant-preprocessor) - this is a header guard
 #define PSYENGINE_INPUT_MANAGER_HPP
 
-
-
 #include <string>
 #include <unordered_map>
 #include <variant>
 
 #include <SDL3/SDL.h>
 
-#include "psyengine/time/timer.hpp"
+#include "psyengine/time/time.hpp"
 
 namespace psyengine::input
 {
@@ -84,7 +82,7 @@ namespace psyengine::input
          * is pressed or released. It also records the precise time the button was pressed and its overall state.
          * This is useful for tracking button interactions and their transitions over time.
          */
-        struct  ButtonData
+        struct ButtonData
         {
             bool isDown = false;
             bool wasDown = false;
@@ -99,26 +97,26 @@ namespace psyengine::input
          * The AxisData structure stores information specific to an input axis, such as the raw SDL-provided
          * value and an optional scaling factor for adjusting sensitivity or range as per user requirements.
          */
-        struct  AxisData
+        struct AxisData
         {
             Sint16 value = 0; // raw SDL value (-32 768 to 32 767)
             float scale = 1.0F; // user-configurable scaling if desired
         };
 
         // --- BINDING TYPES FOR ACTIONS ---
-        struct  KeyBinding
+        struct KeyBinding
         {
             SDL_Keycode key;
             bool operator==(const KeyBinding& other) const = default;
         };
 
-        struct  MouseBinding
+        struct MouseBinding
         {
             Uint8 button;
             bool operator==(const MouseBinding& other) const = default;
         };
 
-        struct  GamepadBinding
+        struct GamepadBinding
         {
             SDL_GamepadButton button;
             SDL_JoystickID joystickId; // 0 means "any"
@@ -143,7 +141,7 @@ namespace psyengine::input
          * @param actionName The name of the action to bind the key to.
          * @param key The SDL_Keycode representing the key to be bound to the action.
          */
-         void bindActionKey(const std::string& actionName, SDL_Keycode key);
+        void bindActionKey(const std::string& actionName, SDL_Keycode key);
         /**
          * @brief Binds a mouse button to a specified action name.
          *
@@ -153,7 +151,7 @@ namespace psyengine::input
          * @param actionName The name of the action to bind the mouse button to.
          * @param button The mouse button to be associated with the action.
          */
-         void bindActionMouseButton(const std::string& actionName, Uint8 button);
+        void bindActionMouseButton(const std::string& actionName, Uint8 button);
 
         /**
          * @brief Binds a specified gamepad button to a named action for a specific joystick.
@@ -166,8 +164,8 @@ namespace psyengine::input
          * @param button The gamepad button to bind to the action.
          * @param joystickId The ID of the joystick to which the binding applies. 0 means any
          */
-         void bindActionGamepadButton(const std::string& actionName, SDL_GamepadButton button,
-                                                      SDL_JoystickID joystickId = 0);
+        void bindActionGamepadButton(const std::string& actionName, SDL_GamepadButton button,
+                                     SDL_JoystickID joystickId = 0);
 
         // --- Queries for actions (aggregated over all bindings) ---
 
@@ -181,7 +179,7 @@ namespace psyengine::input
          * @param actionName The name of the action to check for a click event.
          * @return True if the action is clicked, otherwise false.
          */
-        [[nodiscard]]  bool isActionClicked(const std::string& actionName) const;
+        [[nodiscard]] bool isActionClicked(const std::string& actionName) const;
         /**
          * @brief Checks if an input action is currently being held down.
          *
@@ -192,7 +190,7 @@ namespace psyengine::input
          * @param actionName The name of the action to check for held state.
          * @return True if the action is being held, otherwise false.
          */
-        [[nodiscard]]  bool isActionHeld(const std::string& actionName) const;
+        [[nodiscard]] bool isActionHeld(const std::string& actionName) const;
         /**
          * @brief Checks whether the specified action is currently being performed, based on its binding(s).
          *
@@ -203,7 +201,7 @@ namespace psyengine::input
          * @param actionName The name of the action to check.
          * @return True if any of the bindings for the specified action are active; false otherwise.
          */
-        [[nodiscard]]  bool isActionDown(const std::string& actionName) const;
+        [[nodiscard]] bool isActionDown(const std::string& actionName) const;
         /**
          * @brief Checks if the specified action has been released.
          *
@@ -213,7 +211,7 @@ namespace psyengine::input
          * @param actionName The name of the action to check for a release state.
          * @return True if the action is released, otherwise false.
          */
-        [[nodiscard]]  bool isActionReleased(const std::string& actionName) const;
+        [[nodiscard]] bool isActionReleased(const std::string& actionName) const;
 
         /**
          * @brief Handles an SDL event and processes it to update input states accordingly.
@@ -224,7 +222,7 @@ namespace psyengine::input
          *
          * @param e The SDL_Event instance representing the event to be processed.
          */
-         void handleEvent(const SDL_Event& e);
+        void handleEvent(const SDL_Event& e);
 
         /**
          * @brief Updates the state of input devices including keyboard, mouse, and gamepads.
@@ -240,7 +238,7 @@ namespace psyengine::input
          *
          * @note Has to be called after handling all events and before updating game logic
          */
-         void update();
+        void update();
 
         /**
          * @brief Checks whether the specified key was clicked (pressed and released) during the current frame.
@@ -251,7 +249,7 @@ namespace psyengine::input
          * @param key The SDL_Keycode representing the key to check for the clicked state.
          * @return true if the specified key was clicked during this frame, false otherwise.
          */
-        [[nodiscard]]  bool isClicked(SDL_Keycode key) const;
+        [[nodiscard]] bool isClicked(SDL_Keycode key) const;
 
         /**
          * @brief Checks if the specified key is currently being held down.
@@ -262,7 +260,7 @@ namespace psyengine::input
          * @param key The SDL_Keycode representing the key to check.
          * @return True if the key is currently held down, false otherwise.
          */
-        [[nodiscard]]  bool isHeld(SDL_Keycode key) const;
+        [[nodiscard]] bool isHeld(SDL_Keycode key) const;
 
         /**
          * @brief Checks if the specified key is currently pressed or held.
@@ -274,7 +272,7 @@ namespace psyengine::input
          * @param key The SDL_Keycode representing the key to check.
          * @return True if the key is pressed or held, otherwise false.
          */
-        [[nodiscard]]  bool isDown(SDL_Keycode key) const;
+        [[nodiscard]] bool isDown(SDL_Keycode key) const;
 
         /**
          * @brief Checks if the specified key has been released.
@@ -284,7 +282,7 @@ namespace psyengine::input
          * @param key The SDL_Keycode representing the key to check.
          * @return True if the key has been released, false otherwise.
          */
-        [[nodiscard]]  bool isReleased(SDL_Keycode key) const;
+        [[nodiscard]] bool isReleased(SDL_Keycode key) const;
 
         /**
          * @brief Checks if the specified gamepad button was clicked for the given joystick.
@@ -296,7 +294,7 @@ namespace psyengine::input
          * @param joystickId The unique ID of the joystick to which the button belongs.
          * @return True if the button was clicked, false otherwise.
          */
-        [[nodiscard]]  bool isClicked(SDL_GamepadButton button, SDL_JoystickID joystickId = 0) const;
+        [[nodiscard]] bool isClicked(SDL_GamepadButton button, SDL_JoystickID joystickId = 0) const;
 
         /**
          * @brief Checks if a specified gamepad button on a specific joystick is currently being held down.
@@ -308,7 +306,7 @@ namespace psyengine::input
          * @param joystickId The ID of the joystick associated with the gamepad.
          * @return True if the button is held down; otherwise, false.
          */
-        [[nodiscard]]  bool isHeld(SDL_GamepadButton button, SDL_JoystickID joystickId = 0) const;
+        [[nodiscard]] bool isHeld(SDL_GamepadButton button, SDL_JoystickID joystickId = 0) const;
 
         /**
          * @brief Checks if a specific gamepad button is currently pressed or held down.
@@ -320,7 +318,7 @@ namespace psyengine::input
          * @param joystickId The ID of the gamepad's joystick to query.
          * @return True if the button is pressed or held down; otherwise, false.
          */
-        [[nodiscard]]  bool isDown(SDL_GamepadButton button, SDL_JoystickID joystickId = 0) const;
+        [[nodiscard]] bool isDown(SDL_GamepadButton button, SDL_JoystickID joystickId = 0) const;
 
         /**
          * @brief Checks whether the specified gamepad button was released for the given joystick.
@@ -332,7 +330,7 @@ namespace psyengine::input
          * @param joystickId The ID of the joystick to check the button state for.
          * @return True if the specified button is released, false otherwise.
          */
-        [[nodiscard]]  bool isReleased(SDL_GamepadButton button, SDL_JoystickID joystickId = 0) const;
+        [[nodiscard]] bool isReleased(SDL_GamepadButton button, SDL_JoystickID joystickId = 0) const;
 
         /**
          * @brief Checks whether the specified mouse button was clicked.
@@ -344,7 +342,7 @@ namespace psyengine::input
          * @param mouseButton The mouse button to check for a click event.
          * @return True if the specified mouse button was clicked; otherwise, false.
          */
-        [[nodiscard]]  bool isClicked(Uint8 mouseButton) const;
+        [[nodiscard]] bool isClicked(Uint8 mouseButton) const;
 
         /**
          * @brief Checks if the specified mouse button is currently held down.
@@ -355,7 +353,7 @@ namespace psyengine::input
          * @param mouseButton The mouse button to check.
          * @return True if the mouse button is being held down, otherwise false.
          */
-        [[nodiscard]]  bool isHeld(Uint8 mouseButton) const;
+        [[nodiscard]] bool isHeld(Uint8 mouseButton) const;
 
         /**
          * @brief Checks if the specified mouse button is currently pressed or held down.
@@ -366,7 +364,7 @@ namespace psyengine::input
          * @param mouseButton The mouse button to query.
          * @return True if the mouse button is pressed or held, otherwise false.
          */
-        [[nodiscard]]  bool isDown(Uint8 mouseButton) const;
+        [[nodiscard]] bool isDown(Uint8 mouseButton) const;
 
         /**
          * @brief Checks if the specified mouse button is in the released state.
@@ -377,7 +375,7 @@ namespace psyengine::input
          * @param mouseButton The mouse button to query its release state.
          * @return True if the specified mouse button is released, false otherwise.
          */
-        [[nodiscard]]  bool isReleased(Uint8 mouseButton) const;
+        [[nodiscard]] bool isReleased(Uint8 mouseButton) const;
 
         /**
          * @brief Retrieves the raw value of a specified gamepad axis for a given joystick.
@@ -390,8 +388,8 @@ namespace psyengine::input
          * @return The raw value of the specified axis as a signed 16-bit integer (Sint16).
          *         Returns 0 if the axis or joystick does not exist in the mapping.
          */
-        [[nodiscard]]  Sint16 getAxisRaw(SDL_GamepadAxis gamepadAxis,
-                                                         SDL_JoystickID joystickId = 0) const;
+        [[nodiscard]] Sint16 getAxisRaw(SDL_GamepadAxis gamepadAxis,
+                                        SDL_JoystickID joystickId = 0) const;
 
         /**
          * @brief Retrieves the normalized value of a specific gamepad axis for a given joystick.
@@ -404,8 +402,8 @@ namespace psyengine::input
          * @param joystickId The SDL_JoystickID associated with the joystick being queried.
          * @return The normalized axis value in the range of -1.0 to 1.0, or 0.0 if the raw axis value is zero.
          */
-        [[nodiscard]]  float getAxisNormalized(SDL_GamepadAxis gamepadAxis,
-                                                               SDL_JoystickID joystickId = 0) const;
+        [[nodiscard]] float getAxisNormalized(SDL_GamepadAxis gamepadAxis,
+                                              SDL_JoystickID joystickId = 0) const;
 
         /**
          * @brief Sets the duration threshold for considering an input as a "hold".
@@ -416,7 +414,7 @@ namespace psyengine::input
          *
          * @param seconds The hold threshold time in seconds.
          */
-         void setHoldThreshold(float seconds);
+        void setHoldThreshold(float seconds);
 
         /**
          * @brief Retrieves the threshold duration that determines when an input is considered held.
@@ -427,7 +425,7 @@ namespace psyengine::input
          *
          * @return The hold threshold duration in seconds.
          */
-        [[nodiscard]]  float getHoldThreshold() const;
+        [[nodiscard]] float getHoldThreshold() const;
 
         InputManager(const InputManager& other) = delete;
         InputManager(InputManager&& other) noexcept = delete;
@@ -435,8 +433,8 @@ namespace psyengine::input
         InputManager& operator=(InputManager&& other) noexcept = delete;
 
     private:
-         InputManager() = default;
-         ~InputManager() = default;
+        InputManager() = default;
+        ~InputManager() = default;
 
         std::unordered_map<Uint8, ButtonData> mouseButtons_;
         std::unordered_map<SDL_Keycode, ButtonData> keyboardButtons_;
@@ -479,7 +477,5 @@ namespace psyengine::input
         void updateKeyboardButtons(const time::TimePoint& now);
     };
 }
-
-#include "input_manager.ipp"
 
 #endif //PSYENGINE_INPUT_MANAGER_HPP

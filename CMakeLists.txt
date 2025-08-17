@@ -36,56 +36,20 @@ find_package(SDL3 CONFIG REQUIRED)
 # Optional SDL3 extensions
 set(PSYENGINE_SDL_LIBRARIES SDL3::SDL3)
 
-if(PSYENGINE_WITH_IMAGE)
+if (PSYENGINE_WITH_IMAGE)
     find_package(SDL3_image CONFIG REQUIRED)
     list(APPEND PSYENGINE_SDL_LIBRARIES SDL3_image::SDL3_image)
-endif()
+endif ()
 
-if(PSYENGINE_WITH_MIXER)
+if (PSYENGINE_WITH_MIXER)
     find_package(SDL3_mixer CONFIG REQUIRED)
     list(APPEND PSYENGINE_SDL_LIBRARIES SDL3_mixer::SDL3_mixer)
-endif()
+endif ()
 
-if(PSYENGINE_WITH_TTF)
+if (PSYENGINE_WITH_TTF)
     find_package(SDL3_ttf CONFIG REQUIRED)
     list(APPEND PSYENGINE_SDL_LIBRARIES SDL3_ttf::SDL3_ttf)
-endif()
-
-# ============================================================================
-# Source files
-# ============================================================================
-set(PSYENGINE_SOURCES
-        src/input/input_manager.cpp
-        src/platform/sdl_runtime.cpp
-        src/state/state_manager.cpp
-        src/texture_manager.cpp
-        src/time/clock.cpp
-)
-
-set(PSYENGINE_HEADERS
-        include/psyengine/debug/assert.hpp
-
-        include/psyengine/input/input_manager.hpp
-        include/psyengine/input/input_manager.ipp
-
-        include/psyengine/math/vector2.hpp
-        include/psyengine/math/vector2.ipp
-
-        include/psyengine/platform/sdl_raii.hpp
-        include/psyengine/platform/sdl_runtime.hpp
-
-        include/psyengine/resources/texture_manager.hpp
-
-        include/psyengine/state/base_state.hpp
-        include/psyengine/state/state_manager.hpp
-
-        include/psyengine/time/clock.hpp
-        include/psyengine/time/timer.hpp
-
-        include/psyengine/utils/random_utils.hpp
-
-        include/psyengine/psyengine.hpp
-)
+endif ()
 
 # ============================================================================
 # Create library target
@@ -98,12 +62,12 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # Target configuration
 # ============================================================================
 target_sources(${PROJECT_NAME}
-        PRIVATE ${PSYENGINE_SOURCES}
-
         PUBLIC FILE_SET HEADERS
         BASE_DIRS include
-        FILES ${PSYENGINE_HEADERS}
 )
+
+add_subdirectory(src)
+add_subdirectory(include/psyengine)
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
@@ -136,35 +100,35 @@ else ()
     endif ()
 endif ()
 
-if(MSVC)
+if (MSVC)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
             WIN32_LEAN_AND_MEAN
             NOMINMAX
             _CRT_SECURE_NO_WARNINGS
             /utf-8  # Force UTF-8 encoding
     )
-endif()
+endif ()
 
 # ============================================================================
 # Feature-based compile definitions
 # ============================================================================
-if(PSYENGINE_WITH_IMAGE)
+if (PSYENGINE_WITH_IMAGE)
     target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_IMAGE)
-endif()
+endif ()
 
-if(PSYENGINE_WITH_MIXER)
+if (PSYENGINE_WITH_MIXER)
     target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_MIXER)
-endif()
+endif ()
 
-if(PSYENGINE_WITH_TTF)
+if (PSYENGINE_WITH_TTF)
     target_compile_definitions(${PROJECT_NAME} PRIVATE PSYENGINE_WITH_TTF)
-endif()
+endif ()
 
 # Static library definition
 get_target_property(LIB_TYPE ${PROJECT_NAME} TYPE)
-if(LIB_TYPE STREQUAL "STATIC_LIBRARY")
+if (LIB_TYPE STREQUAL "STATIC_LIBRARY")
     target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}_STATIC_DEFINE)
-endif()
+endif ()
 
 # ============================================================================
 # Target properties
@@ -179,49 +143,49 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 # Link-time optimization
-if(PSYENGINE_LTO)
+if (PSYENGINE_LTO)
     check_ipo_supported(RESULT ipo_supported OUTPUT ipo_error)
-    if(ipo_supported)
+    if (ipo_supported)
         set_target_properties(${PROJECT_NAME} PROPERTIES
                 INTERPROCEDURAL_OPTIMIZATION ON
         )
-    else()
+    else ()
         message(WARNING "LTO requested but not supported: ${ipo_error}")
-    endif()
-endif()
+    endif ()
+endif ()
 
 # ============================================================================
 # Address Sanitizer (Debug builds only)
 # ============================================================================
-if(PSYENGINE_ADDRESS_SANITIZE)
-    if(MSVC)
+if (PSYENGINE_ADDRESS_SANITIZE)
+    if (MSVC)
         target_compile_options(${PROJECT_NAME} PRIVATE
                 $<$<CONFIG:Debug>:/fsanitize=address /Zi>
         )
         target_link_options(${PROJECT_NAME} PRIVATE
                 $<$<CONFIG:Debug>:/fsanitize=address /INCREMENTAL:NO>
         )
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         target_compile_options(${PROJECT_NAME} PRIVATE
                 $<$<CONFIG:Debug>:-fsanitize=address,undefined -fno-omit-frame-pointer -g>
         )
         target_link_options(${PROJECT_NAME} PRIVATE
                 $<$<CONFIG:Debug>:-fsanitize=address,undefined>
         )
-    endif()
-endif()
+    endif ()
+endif ()
 
 # ============================================================================
 # Examples subdirectory
 # ============================================================================
-if(PSYENGINE_EXAMPLES)
+if (PSYENGINE_EXAMPLES)
     add_subdirectory(examples)
-endif()
+endif ()
 
 # ============================================================================
 # Installation
 # ============================================================================
-if(PSYENGINE_INSTALL)
+if (PSYENGINE_INSTALL)
     # Install targets
     install(TARGETS ${PROJECT_NAME}
             EXPORT ${PROJECT_NAME}-targets
@@ -260,12 +224,12 @@ if(PSYENGINE_INSTALL)
     )
 
     # Install README, LICENSE, etc. if they exist
-    foreach(doc_file README.md LICENSE LICENSE.txt CHANGELOG.md)
-        if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${doc_file})
+    foreach (doc_file README.md LICENSE LICENSE.txt CHANGELOG.md)
+        if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${doc_file})
             install(FILES ${doc_file} DESTINATION ${CMAKE_INSTALL_DOCDIR})
-        endif()
-    endforeach()
-endif()
+        endif ()
+    endforeach ()
+endif ()
 
 # ============================================================================
 # Summary

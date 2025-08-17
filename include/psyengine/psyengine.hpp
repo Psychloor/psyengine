@@ -9,7 +9,9 @@
 
 #include "psyengine/input/input_manager.hpp"
 
+#include "psyengine/math/vector.hpp"
 #include "psyengine/math/vector2.hpp"
+#include "psyengine/math/math_utils.hpp"
 
 #include "psyengine/platform/sdl_runtime.hpp"
 
@@ -17,9 +19,8 @@
 #include "psyengine/state/state_manager.hpp"
 
 #include "psyengine/time/clock.hpp"
-#include "psyengine/time/timer.hpp"
+#include "psyengine/time/time.hpp"
 
 #include "psyengine/utils/random_utils.hpp"
-
 
 #endif //PSYENGINE_HPP

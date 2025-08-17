@@ -10,30 +10,27 @@
 
 #include <SDL3/SDL_assert.h>
 
-
-
 namespace psyengine::debug
 {
 
-     inline void Assert(const bool condition,
-                                        [[maybe_unused]] const std::string_view message,
-                                        [[maybe_unused]] const std::source_location& location =
-                                            std::source_location::current())
+    inline void Assert(const bool condition,
+                       [[maybe_unused]] const std::string_view message,
+                       [[maybe_unused]] std::source_location location =
+                           std::source_location::current())
     {
         SDL_assert_always(condition); // NOLINT(*) - SDL knows what they're doing for all platforms
     }
 
 #ifndef NDEBUG
-     inline void DebugAssert(const bool condition,
-                                             const std::string_view message,
-                                             const std::source_location location = std::source_location::current())
+    inline void DebugAssert(const bool condition,
+                            [[maybe_unused]] const std::string_view message,
+                            [[maybe_unused]] std::source_location location = std::source_location::current())
     {
-        SDL_assert(condition);
+        SDL_assert(condition); // NOLINT(*) - SDL knows what they're doing for all platforms
     }
 #else
     constexpr void DebugAssert(const bool, const std::string_view,
-                                      const std::source_location& = std::source_location::current())
-    {}
+                               std::source_location = std::source_location::current()) {}
 #endif
 
 } // namespace psyengine::debug

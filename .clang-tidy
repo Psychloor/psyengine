@@ -94,3 +94,4 @@ clang-analyzer-nullability.NullablePassedToNonnull,
 clang-analyzer-core.StackAddrEscapeBase'
 HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: true
+...

@@ -5,8 +5,6 @@
 #ifndef PSYENGINE_BASE_STATE_HPP
 #define PSYENGINE_BASE_STATE_HPP
 
-
-
 // ReSharper disable twice CppInconsistentNaming
 union SDL_Event;
 struct SDL_Renderer;
@@ -21,7 +19,7 @@ namespace psyengine::state
      * must or can implement to define their specific behavior. These methods
      * facilitate the actions needed during a game's state transitions and interactions.
      */
-    class  BaseState
+    class BaseState
     {
 
     public:
@@ -37,8 +35,7 @@ namespace psyengine::state
         BaseState(const BaseState& other) = delete;
         BaseState& operator=(const BaseState& other) = delete;
 
-        BaseState(BaseState&&) noexcept
-        {}
+        BaseState(BaseState&&) noexcept {}
 
         BaseState& operator=(BaseState&& other) noexcept
         {

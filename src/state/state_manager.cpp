@@ -44,7 +44,8 @@ namespace psyengine::state
         states_.back()->update(deltaTime);
     }
 
-    void StateManager::render(SDL_Renderer* const renderer, const float interpolationFactor) const
+    void StateManager::render(SDL_Renderer * const renderer, const float interpolationFactor)
+    const
     {
         if (states_.empty())
         {

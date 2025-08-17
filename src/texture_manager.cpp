@@ -11,7 +11,6 @@
 
 namespace psyengine::resources
 {
-
     TextureManager& TextureManager::instance()
     {
         static TextureManager inst;

@@ -16,7 +16,7 @@
 
 #include "psyengine/input/input_manager.hpp"
 #include "psyengine/state//state_manager.hpp"
-#include "psyengine/time/timer.hpp"
+#include "psyengine/time/time.hpp"
 
 namespace psyengine::platform
 {

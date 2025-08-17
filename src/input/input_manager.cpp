@@ -3,10 +3,10 @@
 //
 
 #include "psyengine/input/input_manager.hpp"
+#include "psyengine/input/input_manager.ipp"
 
 namespace psyengine::input
 {
-
     InputManager& InputManager::instance()
     {
         static InputManager inst;
@@ -166,20 +166,20 @@ namespace psyengine::input
             break;
 
         case SDL_EVENT_GAMEPAD_AXIS_MOTION:
-        {
-            auto& axis = axes_[e.gaxis.which][static_cast<SDL_GamepadAxis>(e.gaxis.axis)];
-            axis.value = e.gaxis.value; // store raw value
-            break;
-        }
+            {
+                auto& axis = axes_[e.gaxis.which][static_cast<SDL_GamepadAxis>(e.gaxis.axis)];
+                axis.value = e.gaxis.value; // store raw value
+                break;
+            }
 
         case SDL_EVENT_GAMEPAD_REMOVED:
-        {
-            // remove data for that joystick id to avoid stale entries
-            const SDL_JoystickID jid = e.gdevice.which;
-            gamepadButtons_.erase(jid);
-            axes_.erase(jid);
-            break;
-        }
+            {
+                // remove data for that joystick id to avoid stale entries
+                const SDL_JoystickID jid = e.gdevice.which;
+                gamepadButtons_.erase(jid);
+                axes_.erase(jid);
+                break;
+            }
 
         default:
             break;

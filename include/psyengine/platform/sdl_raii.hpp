@@ -5,8 +5,6 @@
 #ifndef PSYENGINE_SDL_RAII_HPP
 #define PSYENGINE_SDL_RAII_HPP
 
-
-
 #include <memory>
 
 #include <SDL3/SDL.h>
@@ -26,7 +24,7 @@ namespace psyengine::platform
      * Ensures that SDL_Window resources are properly released using SDL_DestroyWindow when
      * the managed pointer goes out of scope.
      */
-    struct  SdlWindowDestroyer
+    struct SdlWindowDestroyer
     {
         void operator()(SDL_Window* window) const
         {
@@ -39,7 +37,7 @@ namespace psyengine::platform
      * Ensures proper cleanup of an SDL_Renderer by calling SDL_DestroyRenderer
      * when the managed renderer goes out of scope.
      */
-    struct  SdlRendererDestroyer
+    struct SdlRendererDestroyer
     {
         void operator()(SDL_Renderer* renderer) const
         {
@@ -52,7 +50,7 @@ namespace psyengine::platform
      * This is designed to be used with smart pointers, such as std::shared_ptr or std::unique_ptr, for automatic
      * resource management of SDL_Texture instances.
      */
-    struct  SdlTextureDestroyer
+    struct SdlTextureDestroyer
     {
         void operator()(SDL_Texture* texture) const
         {
@@ -65,7 +63,7 @@ namespace psyengine::platform
      * SDL_Surface resources by calling SDL_FreeSurface when the surface
      * is no longer in use.
      */
-    struct  SdlSurfaceDestroyer
+    struct SdlSurfaceDestroyer
     {
         void operator()(SDL_Surface* surface) const
         {
@@ -78,7 +76,7 @@ namespace psyengine::platform
      * resources are properly released by calling SDL_CloseAudioDevice when the managed
      * audio device goes out of scope.
      */
-    struct  SdlAudioDeviceDestroyer
+    struct SdlAudioDeviceDestroyer
     {
         void operator()(const SDL_AudioDeviceID device) const
         {
@@ -97,7 +95,7 @@ namespace psyengine::platform
      * Ensures the proper cleanup of MIX_Mixer by invoking MIX_DestroyMixer when the mixer is no longer needed.
      * Designed to be used with smart pointers for automatic resource management of audio mixers in SDL_mixer.
      */
-    struct  SdlMixerDestroyer
+    struct SdlMixerDestroyer
     {
         void operator()(MIX_Mixer* mixer) const
         {
@@ -115,7 +113,7 @@ namespace psyengine::platform
      *
      * Designed to be used with smart pointers for automatic memory management of SDL_ttf objects.
      */
-    struct  SdlTtfDestroyer
+    struct SdlTtfDestroyer
     {
         void operator()(TTF_Font* font) const
         {

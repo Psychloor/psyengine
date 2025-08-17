@@ -5,8 +5,6 @@
 #ifndef PSYENGINE_STATE_MANAGER_HPP
 #define PSYENGINE_STATE_MANAGER_HPP
 
-
-
 #include <memory>
 #include <vector>
 
@@ -26,7 +24,7 @@ namespace psyengine::state
          * Provides access to the singleton instance of StateManager.
          * Ensures a single, globally accessible instance throughout the application lifecycle.
          */
-         static StateManager& instance();
+        static StateManager& instance();
 
         /**
          * Handles an event by delegating it to the top-most state in the stack.
@@ -35,7 +33,7 @@ namespace psyengine::state
          * @param event The SDL_Event to be handled. The event can represent different types of user
          * input or system-level events such as key presses, mouse movement, or device connectivity changes.
          */
-         void handleEvent(const SDL_Event& event) const;
+        void handleEvent(const SDL_Event& event) const;
 
         /**
          * Calls the `fixedUpdate` method on the top state in the stack of states
@@ -45,14 +43,14 @@ namespace psyengine::state
          * @param deltaTime The fixed time step (in seconds) used for updating
          *                  the current state's logic.
          */
-         void fixedUpdate(double deltaTime) const;
+        void fixedUpdate(double deltaTime) const;
 
         /**
          * Updates the current state or context based on the implemented functionality.
          *
          * @param deltaTime Time elapsed since the last update, usually used to control the update frequency or calculations.
          */
-         void update(double deltaTime) const;
+        void update(double deltaTime) const;
 
 
         /**
@@ -61,7 +59,7 @@ namespace psyengine::state
          * @param renderer The SDL renderer to be used for drawing operations.
          * @param interpolationFactor A float value used to determine the interpolation between frames for smooth rendering.
          */
-         void render(SDL_Renderer* renderer, float interpolationFactor) const;
+        void render(SDL_Renderer* renderer, float interpolationFactor) const;
 
         /**
          * Pushes a new state onto the state stack. The state is moved into the stack,
@@ -74,7 +72,7 @@ namespace psyengine::state
          * @return True if the state was successfully pushed onto the stack and its
          *         `onEnter` method returned true; otherwise, false.
          */
-         bool pushState(std::unique_ptr<BaseState> state);
+        bool pushState(std::unique_ptr<BaseState> state);
 
         /**
          * Removes the current top state from the stack and calls its exit handler.
@@ -85,12 +83,12 @@ namespace psyengine::state
          *
          * @return true if a state was successfully removed, false if the stack was empty.
          */
-         bool popState();
+        bool popState();
 
         /**
          * Clears all elements or states from the current context, leaving it empty.
          **/
-         void clear();
+        void clear();
 
         /**
          * Replaces the top state in the StateManager with the given state. If no state exists,
@@ -99,14 +97,14 @@ namespace psyengine::state
          * @param state The unique pointer to the new state that will replace the top state.
          * @return True if the operation was successful, false otherwise.
          */
-         bool replaceTopState(std::unique_ptr<BaseState> state);
+        bool replaceTopState(std::unique_ptr<BaseState> state);
 
         /**
          * Checks whether the internal state stack is empty.
          *
          * @return true if the state stack is empty, false otherwise.
          */
-        [[nodiscard]]  bool empty() const noexcept
+        [[nodiscard]] bool empty() const noexcept
         {
             return states_.empty();
         }
@@ -117,7 +115,7 @@ namespace psyengine::state
          *
          * @return The current state at the top of the stack.
          **/
-        [[nodiscard]]  BaseState* current() const noexcept
+        [[nodiscard]] BaseState* current() const noexcept
         {
             return states_.empty() ? nullptr : states_.back().get();
         }
@@ -154,8 +152,8 @@ namespace psyengine::state
         StateManager& operator=(StateManager&&) = delete;
 
     private:
-         StateManager() = default;
-         ~StateManager() = default;
+        StateManager() = default;
+        ~StateManager() = default;
 
         std::vector<std::unique_ptr<BaseState>> states_;
     };

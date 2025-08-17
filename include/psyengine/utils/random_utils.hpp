@@ -16,7 +16,6 @@ namespace psyengine::utils
 {
     namespace detail
     {
-
         /**
          * @brief Specialization of the HasStateSize trait for types that do not provide a `state_size` member.
          *
@@ -27,8 +26,7 @@ namespace psyengine::utils
          * @tparam U A placeholder template parameter for SFINAE defaults to `void`.
          */
         template <typename T, typename U = void>
-        struct  HasStateSize : std::false_type
-        {};
+        struct HasStateSize : std::false_type {};
 
         /**
          * @brief Trait to detect whether a type provides a `state_size` member.
@@ -40,8 +38,7 @@ namespace psyengine::utils
          * @tparam T The type to be checked for the presence of a `state_size` member.
          */
         template <typename T>
-        struct HasStateSize<T, std::void_t<decltype(T::state_size)>> : std::true_type
-        {};
+        struct HasStateSize<T, std::void_t<decltype(T::state_size)>> : std::true_type {};
 
         /**
          * @brief Determines if a given type has a `state_size` member at compile-time.
@@ -138,14 +135,13 @@ namespace psyengine::utils
          * @param x The 64-bit unsigned integer to be mixed.
          * @return The mixed 64-bit unsigned integer.
          */
-        inline  std::uint64_t Mix64(std::uint64_t x)
+        inline std::uint64_t Mix64(std::uint64_t x)
         {
             x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9ULL;
             x = (x ^ (x >> 27)) * 0x94D049BB133111EBULL;
             x ^= (x >> 31);
             return x;
         }
-
     } // namespace detail
 
     /**
@@ -330,7 +326,7 @@ namespace psyengine::utils
      * @note Proper seeding ensures that the RNG produces a random enough and non-repeating
      * sequence of numbers.
      */
-     inline auto MakeMersenne32()
+    inline auto MakeMersenne32()
     {
         return MakeSeededRng<Mersenne32>();
     }
@@ -348,7 +344,7 @@ namespace psyengine::utils
      * @note Proper seeding ensures that the RNG produces a random enough and non-repeating
      * sequence of numbers.
      */
-     inline auto MakeMersenne64()
+    inline auto MakeMersenne64()
     {
         return MakeSeededRng<Mersenne64>();
     }
@@ -388,14 +384,14 @@ namespace psyengine::utils
     template <std::floating_point T = float>
     [[nodiscard]] T RandomFloat(auto& rng, T min = T{0}, T max = T{1})
     {
-        std::uniform_real_distribution<T> dist(min, max);
+        std::uniform_real_distribution < T > dist(min, max);
         return dist(rng);
     }
 
     template <std::integral T = int>
     [[nodiscard]] T RandomInt(auto& rng, T min, T max)
     {
-        std::uniform_int_distribution<T> dist(min, max);
+        std::uniform_int_distribution < T > dist(min, max);
         return dist(rng);
     }
 
@@ -423,7 +419,7 @@ namespace psyengine::utils
     }
 
     // Thread-safe global RNG
-    class  GlobalRng
+    class GlobalRng
     {
     public:
         static auto& get()
@@ -459,7 +455,6 @@ namespace psyengine::utils
     {
         return RandomInt(GlobalRng::get(), min, max);
     }
-
 } // namespace utils::random_utils
 
 #endif //PSYENGINE_RANDOM_UTILS_HPP

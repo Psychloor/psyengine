@@ -5,12 +5,10 @@
 #ifndef PSYENGINE_TEXTURE_MANAGER_HPP
 #define PSYENGINE_TEXTURE_MANAGER_HPP
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <SDL3/SDL_render.h>
-
-
-#include "psyengine/platform/sdl_runtime.hpp"
 
 namespace psyengine::resources
 {
@@ -18,9 +16,9 @@ namespace psyengine::resources
     class TextureManager
     {
     public:
-         static TextureManager& instance();
+        static TextureManager& instance();
 
-         std::shared_ptr<SDL_Texture> loadTexture(const std::string& path, SDL_Renderer* renderer);
+        std::shared_ptr<SDL_Texture> loadTexture(const std::string& path, SDL_Renderer* renderer);
 
         TextureManager(const TextureManager& other) = delete;
         TextureManager(TextureManager&& other) noexcept = delete;
@@ -28,8 +26,8 @@ namespace psyengine::resources
         TextureManager& operator=(TextureManager&& other) noexcept = delete;
 
     private:
-         TextureManager() = default;
-         ~TextureManager() = default;
+        TextureManager() = default;
+        ~TextureManager() = default;
 
         std::unordered_map<std::string, std::shared_ptr<SDL_Texture>> textures_;
     };

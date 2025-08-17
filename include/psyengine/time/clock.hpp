@@ -5,8 +5,6 @@
 #ifndef PSYENGINE_CLOCK_HPP
 #define PSYENGINE_CLOCK_HPP
 
-
-
 #include <chrono>
 
 namespace psyengine::time
@@ -31,7 +29,7 @@ namespace psyengine::time
          * Initializes a Clock object with default settings.
          * This constructor does not perform any additional setup actions.
          */
-         Clock() = default;
+        Clock() = default;
 
         /**
          * @brief Starts the clock if it is not already running.
@@ -40,7 +38,7 @@ namespace psyengine::time
          * and sets the clock to a running state. If the clock is already running,
          * this method has no effect.
          */
-         void start() noexcept;
+        void start() noexcept;
 
         /**
          * @brief Stops the clock and records the end time.
@@ -48,7 +46,7 @@ namespace psyengine::time
          * Disables the clock's running state and captures the current time as the endpoint,
          * enabling the measurement of the elapsed time between the start and stop operations.
          */
-         void stop() noexcept;
+        void stop() noexcept;
 
         /**
          * @brief Restarts the clock by resetting its start and end time points to the current time
@@ -62,7 +60,7 @@ namespace psyengine::time
          * @thread_safety This method is not thread-safe and should not be called concurrently on the
          * same clock instance.
          */
-         void restart() noexcept;
+        void restart() noexcept;
 
         /**
          * @brief Resets the clock, setting the `start_` and `end_` time points to the current time
@@ -77,14 +75,14 @@ namespace psyengine::time
          *
          * @note This function does not start the clock; it only resets its state.
          */
-         void reset() noexcept;
+        void reset() noexcept;
 
         /**
          * Checks whether the clock is currently running.
          *
          * @return true if the clock is running, false otherwise.
          */
-         [[nodiscard]]  bool isRunning() const noexcept;
+        [[nodiscard]] bool isRunning() const noexcept;
 
         /**
          * @brief Returns the elapsed time since the clock started.
@@ -99,7 +97,7 @@ namespace psyengine::time
          *         time. Otherwise, it is the difference between the stopping
          *         time and the starting time.
          */
-        [[nodiscard]]  Duration elapsed() const noexcept;
+        [[nodiscard]] Duration elapsed() const noexcept;
 
         /**
          * Calculates the total elapsed time in seconds.
@@ -111,7 +109,7 @@ namespace psyengine::time
          *
          * @return The elapsed time in seconds as a double.
          */
-        [[nodiscard]]  double elapsedSeconds() const noexcept;
+        [[nodiscard]] double elapsedSeconds() const noexcept;
 
         /**
          * Calculates the total elapsed time in milliseconds since the clock was started.
@@ -120,7 +118,7 @@ namespace psyengine::time
          *
          * @return The elapsed time in milliseconds as a signed integer.
          */
-        [[nodiscard]]  long long elapsedMilliseconds() const noexcept;
+        [[nodiscard]] long long elapsedMilliseconds() const noexcept;
 
         /**
          * Returns the time elapsed in nanoseconds since the last call to start().
@@ -132,7 +130,7 @@ namespace psyengine::time
          * @return The elapsed time in nanoseconds as a signed integer.
          * @note The result is computed using the std::chrono::nanoseconds duration.
          */
-        [[nodiscard]]  long long elapsedNanoseconds() const noexcept;
+        [[nodiscard]] long long elapsedNanoseconds() const noexcept;
 
         /**
          * Calculates the duration elapsed since the specified time point.
@@ -140,7 +138,7 @@ namespace psyengine::time
          * @param timePoint A reference to the time point from which the elapsed duration is to be calculated.
          * @return The duration that has elapsed since the given time point.
          */
-        [[nodiscard]]  static Duration elapsedSince(const TimePoint& timePoint) noexcept;
+        [[nodiscard]] static Duration elapsedSince(const TimePoint& timePoint) noexcept;
 
         /**
          * @brief Provides the current time point based on the high-resolution clock.
@@ -151,7 +149,7 @@ namespace psyengine::time
          *
          * @return The current time point as a ClockType::time_point object.
          */
-        [[nodiscard]]  static TimePoint now() noexcept;
+        [[nodiscard]] static TimePoint now() noexcept;
 
     private:
         TimePoint start_, end_;
